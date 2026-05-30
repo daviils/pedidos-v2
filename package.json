@@ -12,7 +12,9 @@
     "admin:start": "ng serve admin",
     "admin:build": "ng build admin",
     "web:start": "ng serve web",
-    "web:build": "ng build web"
+    "web:build": "ng build web",
+    "web:codegen": "graphql-codegen --config codegen.ts",
+    "web:codegen:watch": "graphql-codegen --config codegen.ts --watch"
   },
   "dependencies": {
     "@angular/animations": "^20.0.0",
@@ -22,6 +24,9 @@
     "@angular/forms": "^20.0.0",
     "@angular/platform-browser": "^20.0.0",
     "@angular/router": "^20.0.0",
+    "@apollo/client": "^4.2.0",
+    "apollo-angular": "^14.0.0",
+    "graphql": "^16.14.0",
     "rxjs": "^7.8.1",
     "tslib": "^2.6.2",
     "zone.js": "^0.15.0"
@@ -30,6 +35,8 @@
     "@angular/build": "^20.0.0",
     "@angular/cli": "^20.0.0",
     "@angular/compiler-cli": "^20.0.0",
+    "@graphql-codegen/cli": "^7.1.0",
+    "@graphql-codegen/client-preset": "^6.0.1",
     "typescript": "^5.8.0"
   }
 }
