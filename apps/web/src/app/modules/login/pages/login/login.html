@@ -39,7 +39,13 @@
         </div>
       </div>
 
-      <button type="submit" class="btn btn-dark w-100 fw-bold">Entrar</button>
+      <div *ngIf="errorMessage" class="alert alert-danger py-2 mb-3">
+        {{ errorMessage }}
+      </div>
+
+      <button type="submit" class="btn btn-dark w-100 fw-bold" [disabled]="isSubmitting">
+        {{ isSubmitting ? 'Entrando...' : 'Entrar' }}
+      </button>
     </form>
   </div>
 </section>
