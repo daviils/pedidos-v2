@@ -1,0 +1,35 @@
+{
+  "name": "pedidos-v2",
+  "version": "0.0.1",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "api:start": "npm run start --workspace @pedidos/api",
+    "api:start:dev": "npm run start:dev --workspace @pedidos/api",
+    "api:build": "npm run build --workspace @pedidos/api",
+    "admin:start": "ng serve admin",
+    "admin:build": "ng build admin",
+    "web:start": "ng serve web",
+    "web:build": "ng build web"
+  },
+  "dependencies": {
+    "@angular/animations": "^20.0.0",
+    "@angular/common": "^20.0.0",
+    "@angular/compiler": "^20.0.0",
+    "@angular/core": "^20.0.0",
+    "@angular/forms": "^20.0.0",
+    "@angular/platform-browser": "^20.0.0",
+    "@angular/router": "^20.0.0",
+    "rxjs": "^7.8.1",
+    "tslib": "^2.6.2",
+    "zone.js": "^0.15.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^20.0.0",
+    "@angular/cli": "^20.0.0",
+    "@angular/compiler-cli": "^20.0.0",
+    "typescript": "^5.8.0"
+  }
+}
