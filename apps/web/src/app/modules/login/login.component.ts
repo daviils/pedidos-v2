@@ -3,15 +3,15 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { Apollo } from 'apollo-angular';
 import { finalize } from 'rxjs';
 
-import { LoginDocument } from '../../../../graphql/generated/graphql';
+import { LoginDocument } from '../../graphql/generated/graphql';
 
 @Component({
   selector: 'app-login',
   standalone: false,
-  templateUrl: './login.html',
-  styleUrl: './login.css',
+  templateUrl: './login.component.html',
+  styleUrl: './login.component.css',
 })
-export class Login {
+export class LoginComponent {
   protected showPassword = false;
   protected isSubmitting = false;
   protected errorMessage = '';

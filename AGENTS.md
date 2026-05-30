@@ -41,7 +41,9 @@ No test command is configured yet. Add app-specific test scripts before document
 
 Use TypeScript for all application code. Keep formatting consistent with the existing files: two-space indentation in JSON, semicolons in TypeScript, and single quotes for imports and strings.
 
-NestJS files should follow framework naming patterns such as `*.module.ts`, `*.controller.ts`, and `*.service.ts`. Angular components currently use standalone components with colocated files such as `app.ts`, `app.html`, and `app.css`.
+NestJS files should follow framework naming patterns such as `*.module.ts`, `*.controller.ts`, and `*.service.ts`. Angular component files should use the `*.component.ts`, `*.component.html`, and `*.component.css` pattern, and component classes should be named with the `Component` suffix, such as `LoginComponent`.
+
+For simple Angular feature modules, keep the component files at the module root instead of adding an extra `pages/` layer unless the feature structure clearly needs that separation.
 
 Use clear, domain-focused names in Portuguese or English consistently within the same feature. Avoid broad utility abstractions until there is repeated usage.
 
