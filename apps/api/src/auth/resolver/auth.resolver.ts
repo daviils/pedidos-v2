@@ -15,7 +15,7 @@ export class AuthResolver {
   login(
     @Args('email', { type: () => String }) email: string,
     @Args('password', { type: () => String }) password: string,
-  ): AuthToken {
+  ): Promise<AuthToken> {
     return this.authService.login(email, password);
   }
 

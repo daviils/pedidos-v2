@@ -13,8 +13,8 @@ export class AuthService {
     private readonly userService: UserService,
   ) {}
 
-  login(email: string, password: string): AuthToken {
-    const user = this.userService.findByEmail(email);
+  async login(email: string, password: string): Promise<AuthToken> {
+    const user = await this.userService.findByEmail(email);
 
     if (!user || user.password !== password) {
       throw new UnauthorizedException('Email ou senha invalidos');
@@ -31,8 +31,8 @@ export class AuthService {
     };
   }
 
-  validateJwtPayload(payload: JwtPayload): User {
-    const user = this.userService.findById(payload.sub);
+  async validateJwtPayload(payload: JwtPayload): Promise<User> {
+    const user = await this.userService.findById(payload.sub);
 
     if (!user) {
       throw new UnauthorizedException('Usuario nao autorizado');

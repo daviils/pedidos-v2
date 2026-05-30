@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { GraphQLModule } from '@nestjs/graphql';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 
 import { AppResolver } from './app.resolver';
@@ -10,6 +11,21 @@ import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
+    TypeOrmModule.forRoot({
+      type: 'mssql',
+      host: process.env.DATABASE_HOST ?? 'localhost',
+      port: Number(process.env.DATABASE_PORT ?? 1433),
+      username: process.env.DATABASE_USERNAME ?? 'sa',
+      password: process.env.DATABASE_PASSWORD ?? 'password',
+      database: process.env.DATABASE_NAME ?? 'pedidos',
+      autoLoadEntities: true,
+      synchronize: process.env.TYPEORM_SYNCHRONIZE === 'true',
+      options: {
+        encrypt: process.env.DATABASE_ENCRYPT === 'true',
+        trustServerCertificate:
+          process.env.DATABASE_TRUST_SERVER_CERTIFICATE !== 'false',
+      },
+    }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: true,

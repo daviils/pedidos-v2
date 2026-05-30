@@ -11,6 +11,7 @@ Padrão de arquitetura da API:
 - Cada módulo de domínio deve ter seu arquivo principal no padrão `<dominio>.module.ts`, como `src/user/user.module.ts`.
 - Dentro de cada módulo, separar as responsabilidades em pastas específicas:
   - `entity`: entidades GraphQL no padrão `<dominio>.entity.ts`.
+  - `dtos`: modelos de input/output no padrão `<acao>-<dominio>.input.ts`, como `create-user.input.ts` e `update-user.input.ts`.
   - `resolver`: resolvers GraphQL no padrão `<dominio>.resolver.ts`.
   - `service`: services no padrão `<dominio>.service.ts`.
 - O `module` do domínio deve registrar seus `providers`, como resolver e service.
