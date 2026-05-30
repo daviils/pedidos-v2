@@ -1,0 +1,6 @@
+# Fragments compartilhados entre queries e mutations.
+query Me {
+    me {
+        ...User
+    }
+}

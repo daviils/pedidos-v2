@@ -3,11 +3,22 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
+import { loadEnvFile } from 'node:process';
 
 import { AppResolver } from './app.resolver';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
+
+const envFilePath = existsSync(join(process.cwd(), '.env'))
+  ? join(process.cwd(), '.env')
+  : join(process.cwd(), 'apps/api/.env');
+
+if (existsSync(envFilePath)) {
+  loadEnvFile(envFilePath);
+}
 
 @Module({
   imports: [

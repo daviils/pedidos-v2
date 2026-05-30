@@ -1,0 +1,24 @@
+type User {
+  id: String!
+  email: String!
+  name: String!
+  profile: UserProfile!
+}
+
+enum UserProfile {
+  User
+}
+
+type AuthToken {
+  accessToken: String!
+  tokenType: String!
+}
+
+type Query {
+  health: String!
+  me: User!
+}
+
+type Mutation {
+  login(email: String!, password: String!): AuthToken!
+}

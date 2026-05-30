@@ -13,8 +13,8 @@
     "admin:build": "ng build admin",
     "web:start": "ng serve web",
     "web:build": "ng build web",
-    "web:codegen": "graphql-codegen --config codegen.ts",
-    "web:codegen:watch": "graphql-codegen --config codegen.ts --watch"
+    "web:codegen": "graphql-codegen --config codegen.yml",
+    "web:codegen:watch": "graphql-codegen --config codegen.yml --watch"
   },
   "dependencies": {
     "@angular/animations": "^20.0.0",

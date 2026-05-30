@@ -1,0 +1,10 @@
+overwrite: true
+schema: "http://localhost:3000/graphql"
+documents:
+  - "apps/web/graphql/**/*.graphql"
+  - "!apps/web/graphql/schema.graphql"
+generates:
+  apps/web/src/app/graphql/generated/:
+    preset: "client"
+    presetConfig:
+      gqlTagName: "gql"
