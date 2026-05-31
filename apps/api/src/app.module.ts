@@ -9,7 +9,9 @@ import { loadEnvFile } from 'node:process';
 
 import { AppResolver } from './app.resolver';
 import { AppService } from './app.service';
+import { AuthAdminModule } from './auth-admin/auth-admin.module';
 import { AuthModule } from './auth/auth.module';
+import { UserAdminModule } from './user-admin/user-admin.module';
 import { UserModule } from './user/user.module';
 
 const envFilePath = existsSync(join(process.cwd(), '.env'))
@@ -44,7 +46,9 @@ if (existsSync(envFilePath)) {
       playground: false,
       plugins: [ApolloServerPluginLandingPageLocalDefault()],
     }),
+    AuthAdminModule,
     AuthModule,
+    UserAdminModule,
     UserModule,
   ],
   providers: [AppService, AppResolver],
