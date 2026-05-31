@@ -1,4 +1,4 @@
-fragment User on User {
+fragment User on UserAdmin {
   id
   email
   name

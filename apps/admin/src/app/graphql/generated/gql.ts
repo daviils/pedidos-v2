@@ -14,14 +14,14 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
-    "fragment User on User {\n  id\n  email\n  name\n}": typeof types.UserFragmentDoc,
-    "mutation Login($email: String!, $password: String!) {\n  login(email: $email, password: $password) {\n    accessToken\n    tokenType\n  }\n}": typeof types.LoginDocument,
-    "query Me {\n  me {\n    ...User\n  }\n}": typeof types.MeDocument,
+    "fragment User on UserAdmin {\n  id\n  email\n  name\n}": typeof types.UserFragmentDoc,
+    "mutation Login($email: String!, $password: String!) {\n  loginAdmin(email: $email, password: $password) {\n    accessToken\n    tokenType\n  }\n}": typeof types.LoginDocument,
+    "query Me {\n  getMeAdmin {\n    ...User\n  }\n}": typeof types.MeDocument,
 };
 const documents: Documents = {
-    "fragment User on User {\n  id\n  email\n  name\n}": types.UserFragmentDoc,
-    "mutation Login($email: String!, $password: String!) {\n  login(email: $email, password: $password) {\n    accessToken\n    tokenType\n  }\n}": types.LoginDocument,
-    "query Me {\n  me {\n    ...User\n  }\n}": types.MeDocument,
+    "fragment User on UserAdmin {\n  id\n  email\n  name\n}": types.UserFragmentDoc,
+    "mutation Login($email: String!, $password: String!) {\n  loginAdmin(email: $email, password: $password) {\n    accessToken\n    tokenType\n  }\n}": types.LoginDocument,
+    "query Me {\n  getMeAdmin {\n    ...User\n  }\n}": types.MeDocument,
 };
 
 /**
@@ -41,15 +41,15 @@ export function gql(source: string): unknown;
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "fragment User on User {\n  id\n  email\n  name\n}"): (typeof documents)["fragment User on User {\n  id\n  email\n  name\n}"];
+export function gql(source: "fragment User on UserAdmin {\n  id\n  email\n  name\n}"): (typeof documents)["fragment User on UserAdmin {\n  id\n  email\n  name\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation Login($email: String!, $password: String!) {\n  login(email: $email, password: $password) {\n    accessToken\n    tokenType\n  }\n}"): (typeof documents)["mutation Login($email: String!, $password: String!) {\n  login(email: $email, password: $password) {\n    accessToken\n    tokenType\n  }\n}"];
+export function gql(source: "mutation Login($email: String!, $password: String!) {\n  loginAdmin(email: $email, password: $password) {\n    accessToken\n    tokenType\n  }\n}"): (typeof documents)["mutation Login($email: String!, $password: String!) {\n  loginAdmin(email: $email, password: $password) {\n    accessToken\n    tokenType\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "query Me {\n  me {\n    ...User\n  }\n}"): (typeof documents)["query Me {\n  me {\n    ...User\n  }\n}"];
+export function gql(source: "query Me {\n  getMeAdmin {\n    ...User\n  }\n}"): (typeof documents)["query Me {\n  getMeAdmin {\n    ...User\n  }\n}"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};

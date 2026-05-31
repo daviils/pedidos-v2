@@ -63,7 +63,7 @@ export class LoginComponent {
       .pipe(finalize(() => (this.isSubmitting = false)))
       .subscribe({
         next: ({ data }) => {
-          this.accessToken = data?.login.accessToken ?? '';
+          this.accessToken = data?.loginAdmin.accessToken ?? '';
           if (this.accessToken) {
             localStorage.setItem('accessToken', this.accessToken);
             void this.router.navigateByUrl('/');
