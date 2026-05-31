@@ -14,7 +14,10 @@ export class ProductService {
   ) {}
 
   async create(data: CreateProductInput): Promise<Product> {
-    const product = this.productRepository.create(data);
+    const product = this.productRepository.create({
+      ...data,
+      photoUrl: this.getImageName(data.photoUrl),
+    });
 
     return this.productRepository.save(product);
   }
@@ -36,6 +39,10 @@ export class ProductService {
 
     Object.assign(product, data);
 
+    if (data.photoUrl) {
+      product.photoUrl = this.getImageName(data.photoUrl);
+    }
+
     return this.productRepository.save(product);
   }
 
@@ -49,5 +56,11 @@ export class ProductService {
     await this.productRepository.remove(product);
 
     return product;
+  }
+
+  private getImageName(photoUrl: string): string {
+    const imagePath = photoUrl.split('?')[0];
+
+    return imagePath.split('/').pop() ?? imagePath;
   }
 }

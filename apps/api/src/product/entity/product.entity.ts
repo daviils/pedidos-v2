@@ -16,6 +16,10 @@ export class Product {
   @Column()
   description: string;
 
+  @Field(() => String)
+  @Column()
+  photoUrl: string;
+
   @Field(() => Float)
   @Column('decimal', { precision: 10, scale: 2 })
   price: number;

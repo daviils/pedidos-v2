@@ -10,6 +10,7 @@ import {
   ProductDocument,
   UpdateProductDocument,
 } from '../../../graphql/generated/graphql';
+import { UtilComponent } from '../../../core/util.component';
 
 @Component({
   selector: 'app-product-detail',
@@ -19,7 +20,7 @@ import {
 })
 export class ProductDetailComponent implements OnInit {
   protected product: CreateProductInput = this.createEmptyProduct();
-  protected priceFormatted = this.formatMoney(this.product.price);
+  protected priceFormatted = '';
   protected productId = '';
   protected isLoading = false;
   protected isSubmitting = false;
@@ -29,7 +30,10 @@ export class ProductDetailComponent implements OnInit {
     private readonly activatedRoute: ActivatedRoute,
     private readonly apollo: Apollo,
     private readonly router: Router,
-  ) {}
+    private readonly utilComponent: UtilComponent,
+  ) {
+    this.priceFormatted = this.utilComponent.formatMoney(this.product.price);
+  }
 
   ngOnInit(): void {
     this.productId = this.activatedRoute.snapshot.paramMap.get('id') ?? '';
@@ -53,11 +57,9 @@ export class ProductDetailComponent implements OnInit {
   }
 
   protected formatPrice(value: string): void {
-    const cents = Number(value.replace(/\D/g, ''));
-    const price = cents / 100;
-
+    const { price, priceFormatted } = this.utilComponent.formatPrice(value);
     this.product.price = price;
-    this.priceFormatted = this.formatMoney(price);
+    this.priceFormatted = priceFormatted;
   }
 
   private saveProduct(): void {
@@ -96,7 +98,9 @@ export class ProductDetailComponent implements OnInit {
             description: data.product.description,
             price: data.product.price,
           };
-          this.priceFormatted = this.formatMoney(data.product.price);
+          this.priceFormatted = this.utilComponent.formatMoney(
+            data.product.price,
+          );
         },
         error: () => {
           this.errorMessage = 'Nao foi possivel carregar o produto';
@@ -169,14 +173,5 @@ export class ProductDetailComponent implements OnInit {
       description: '',
       price: 0,
     };
-  }
-
-  private formatMoney(value: number): string {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(value);
   }
 }

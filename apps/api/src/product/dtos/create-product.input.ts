@@ -8,6 +8,9 @@ export class CreateProductInput {
   @Field(() => String)
   description: string;
 
+  @Field(() => String)
+  photoUrl: string;
+
   @Field(() => Float)
   price: number;
 }

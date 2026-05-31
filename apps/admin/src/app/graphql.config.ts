@@ -5,7 +5,9 @@ import { setContext } from '@apollo/client/link/context';
 import { provideApollo } from 'apollo-angular';
 import { HttpLink } from 'apollo-angular/http';
 
-const GRAPHQL_URI = 'http://localhost:3000/graphql';
+import { environment } from '../environments/environment';
+
+const GRAPHQL_URI = `${environment.baseUrl}/graphql`;
 
 export const graphqlProviders: ApplicationConfig['providers'] = [
   provideHttpClient(),

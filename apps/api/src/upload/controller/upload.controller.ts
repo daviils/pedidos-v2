@@ -6,6 +6,12 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiCreatedResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 import { UploadService } from '../service/upload.service';
 
@@ -15,11 +21,38 @@ type UploadedImageFile = {
   originalname: string;
 };
 
+@ApiTags('upload')
 @Controller('upload')
 export class UploadController {
   constructor(private readonly uploadService: UploadService) {}
 
   @Post('upload-product')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+      required: ['file'],
+    },
+  })
+  @ApiCreatedResponse({
+    description: 'Imagem enviada com sucesso',
+    schema: {
+      type: 'object',
+      properties: {
+        url: {
+          type: 'string',
+          example:
+            'https://pedidos2.blob.core.windows.net/product-images/products/image.jpg',
+        },
+      },
+    },
+  })
   @UseInterceptors(
     FileInterceptor('file', {
       limits: {
