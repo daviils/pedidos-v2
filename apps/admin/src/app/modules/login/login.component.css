@@ -1,0 +1,14 @@
+:host {
+  min-height: calc(100vh - 64px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login {
+  width: min(100%, 360px);
+}
+
+.login__password-toggle {
+  min-width: 44px;
+}
