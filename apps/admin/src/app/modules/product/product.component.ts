@@ -24,7 +24,7 @@ export class ProductComponent implements OnInit {
   constructor(private readonly apollo: Apollo) {}
 
   ngOnInit(): void {
-    // this.loadProducts();
+    this.loadProducts();
   }
 
   protected get filteredProducts(): Product[] {

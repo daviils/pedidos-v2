@@ -1,0 +1,90 @@
+<section class="product-detail-page">
+  <div class="product-detail-page__header">
+    <div>
+      <h1>{{ productId ? 'Detalhe do produto' : 'Criar produto' }}</h1>
+      <p>{{ productId ? 'Visualize os dados do produto.' : 'Cadastre um novo produto.' }}</p>
+    </div>
+
+    <a class="btn btn-outline-dark" routerLink="/product">Voltar</a>
+  </div>
+
+  <form
+    class="product-detail-page__form"
+    #productForm="ngForm"
+    (ngSubmit)="submit(productForm)"
+  >
+    <div *ngIf="isLoading" class="alert alert-secondary py-2">
+      Carregando produto...
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger py-2">
+      {{ errorMessage }}
+    </div>
+
+    <div class="mb-3">
+      <label for="title" class="form-label fw-semibold">Titulo</label>
+      <input
+        id="title"
+        name="title"
+        type="text"
+        class="form-control"
+        required
+        [(ngModel)]="product.title"
+        #title="ngModel"
+      />
+      <div
+        *ngIf="title.invalid && title.touched"
+        class="form-text text-danger"
+      >
+        Informe o titulo do produto.
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="description" class="form-label fw-semibold">Descricao</label>
+      <textarea
+        id="description"
+        name="description"
+        class="form-control"
+        rows="4"
+        required
+        [(ngModel)]="product.description"
+        #description="ngModel"
+      ></textarea>
+      <div
+        *ngIf="description.invalid && description.touched"
+        class="form-text text-danger"
+      >
+        Informe a descricao do produto.
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <label for="price" class="form-label fw-semibold">Preco</label>
+      <input
+        id="price"
+        name="price"
+        type="text"
+        class="form-control"
+        inputmode="numeric"
+        required
+        [ngModel]="priceFormatted"
+        (ngModelChange)="formatPrice($event)"
+        #price="ngModel"
+      />
+      <div
+        *ngIf="price.invalid && price.touched"
+        class="form-text text-danger"
+      >
+        Informe o preco do produto.
+      </div>
+    </div>
+
+    <div class="product-detail-page__actions">
+      <a class="btn btn-outline-secondary" routerLink="/product">Cancelar</a>
+      <button type="submit" class="btn btn-dark" [disabled]="isSubmitting">
+        {{ isSubmitting ? 'Salvando...' : 'Salvar produto' }}
+      </button>
+    </div>
+  </form>
+</section>

@@ -5,14 +5,18 @@
       <p>Lista de produtos cadastrados.</p>
     </div>
 
-    <button
-      type="button"
-      class="btn btn-outline-dark"
-      [disabled]="isLoading"
-      (click)="loadProducts()"
-    >
-      Atualizar
-    </button>
+    <div class="product-page__actions">
+      <a class="btn btn-dark" routerLink="create">Criar produto</a>
+
+      <button
+        type="button"
+        class="btn btn-outline-dark"
+        [disabled]="isLoading"
+        (click)="loadProducts()"
+      >
+        Atualizar
+      </button>
+    </div>
   </div>
 
   <div *ngIf="errorMessage" class="alert alert-danger py-2">
@@ -52,7 +56,11 @@
           </td>
         </tr>
 
-        <tr *ngFor="let product of filteredProducts">
+        <tr
+          *ngFor="let product of filteredProducts"
+          class="product-page__row"
+          [routerLink]="['detail', product.id]"
+        >
           <td class="fw-semibold">{{ product.title }}</td>
           <td>{{ product.description }}</td>
           <td class="text-end">

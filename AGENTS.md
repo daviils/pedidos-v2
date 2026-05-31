@@ -43,7 +43,7 @@ Use TypeScript for all application code. Keep formatting consistent with the exi
 
 NestJS files should follow framework naming patterns such as `*.module.ts`, `*.controller.ts`, and `*.service.ts`. Angular component files should use the `*.component.ts`, `*.component.html`, and `*.component.css` pattern, and component classes should be named with the `Component` suffix, such as `LoginComponent`.
 
-For simple Angular feature modules, keep the component files at the module root instead of adding an extra `pages/` layer unless the feature structure clearly needs that separation.
+For Angular feature modules, create each component inside a folder with the same kebab-case component name, for example `product-detail/product-detail.component.ts`, `product-detail/product-detail.component.html`, and `product-detail/product-detail.component.css`. Do not add an extra `pages/` layer unless the feature structure clearly needs that separation.
 
 Use clear, domain-focused names in Portuguese or English consistently within the same feature. Avoid broad utility abstractions until there is repeated usage.
 
