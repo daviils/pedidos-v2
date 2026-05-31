@@ -1,18 +1,7 @@
-type User {
-  id: String!
-  email: String!
-  name: String!
-  profile: UserProfile!
-}
-
 type UserAdmin {
   id: String!
   email: String!
   name: String!
-}
-
-enum UserProfile {
-  User
 }
 
 type AuthToken {
@@ -20,13 +9,84 @@ type AuthToken {
   tokenType: String!
 }
 
+type User {
+  id: String!
+  email: String!
+  name: String!
+  profile: UserProfile!
+}
+
+enum UserProfile {
+  User
+}
+
+type Product {
+  id: String!
+  title: String!
+  description: String!
+  price: Float!
+}
+
 type Query {
   health: String!
-  me: User!
   getMeAdmin: UserAdmin!
+  usersAdmin: [UserAdmin!]!
+  userAdmin(id: String!): UserAdmin
+  me: User!
+  users: [User!]!
+  user(id: String!): User
+  products: [Product!]!
+  product(id: String!): Product
 }
 
 type Mutation {
-  login(email: String!, password: String!): AuthToken!
   loginAdmin(email: String!, password: String!): AuthToken!
+  createUserAdmin(data: CreateUserAdminInput!): UserAdmin!
+  updateUserAdmin(id: String!, data: UpdateUserAdminInput!): UserAdmin!
+  deleteUserAdmin(id: String!): UserAdmin!
+  login(email: String!, password: String!): AuthToken!
+  createUser(data: CreateUserInput!): User!
+  updateUser(id: String!, data: UpdateUserInput!): User!
+  deleteUser(id: String!): User!
+  createProduct(data: CreateProductInput!): Product!
+  updateProduct(id: String!, data: UpdateProductInput!): Product!
+  deleteProduct(id: String!): Product!
+}
+
+input CreateUserAdminInput {
+  email: String!
+  name: String!
+  password: String!
+}
+
+input UpdateUserAdminInput {
+  email: String
+  name: String
+  password: String
+}
+
+input CreateUserInput {
+  email: String!
+  name: String!
+  password: String!
+  profile: UserProfile
+}
+
+input UpdateUserInput {
+  email: String
+  name: String
+  password: String
+  profile: UserProfile
+}
+
+input CreateProductInput {
+  title: String!
+  description: String!
+  price: Float!
+}
+
+input UpdateProductInput {
+  title: String
+  description: String
+  price: Float
 }

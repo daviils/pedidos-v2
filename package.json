@@ -11,6 +11,8 @@
     "api:build": "npm run build --workspace @pedidos/api",
     "admin:start": "npm run start --workspace @pedidos/admin",
     "admin:build": "npm run build --workspace @pedidos/admin",
+    "admin:codegen": "npm run codegen --workspace @pedidos/admin",
+    "admin:codegen:watch": "npm run codegen:watch --workspace @pedidos/admin",
     "web:start": "npm run start --workspace @pedidos/web",
     "web:build": "npm run build --workspace @pedidos/web",
     "web:codegen": "npm run codegen --workspace @pedidos/web",

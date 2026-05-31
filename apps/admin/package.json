@@ -5,8 +5,8 @@
   "scripts": {
     "start": "cd ../.. && ng serve admin",
     "build": "cd ../.. && ng build admin",
-    "codegen": "cd ../.. && graphql-codegen --config codegen.yml",
-    "codegen:watch": "cd ../.. && graphql-codegen --config codegen.yml --watch"
+    "codegen": "cd ../.. && graphql-codegen --config apps/admin/codegen.yml",
+    "codegen:watch": "cd ../.. && graphql-codegen --config apps/admin/codegen.yml --watch"
   },
   "dependencies": {
     "@angular/animations": "^20.0.0",

@@ -1,0 +1,44 @@
+query Products {
+    products {
+        id
+        title
+        description
+        price
+    }
+}
+
+query Product($id: String!) {
+    product(id: $id) {
+        id
+        title
+        description
+        price
+    }
+}
+
+mutation CreateProduct($data: CreateProductInput!) {
+    createProduct(data: $data) {
+        id
+        title
+        description
+        price
+    }
+}
+
+mutation UpdateProduct($id: String!, $data: UpdateProductInput!) {
+    updateProduct(id: $id, data: $data) {
+        id
+        title
+        description
+        price
+    }
+}
+
+mutation DeleteProduct($id: String!) {
+    deleteProduct(id: $id) {
+        id
+        title
+        description
+        price
+    }
+}

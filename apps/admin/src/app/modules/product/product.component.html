@@ -1,0 +1,65 @@
+<section class="product-page">
+  <div class="product-page__header">
+    <div>
+      <h1>Produtos</h1>
+      <p>Lista de produtos cadastrados.</p>
+    </div>
+
+    <button
+      type="button"
+      class="btn btn-outline-dark"
+      [disabled]="isLoading"
+      (click)="loadProducts()"
+    >
+      Atualizar
+    </button>
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger py-2">
+    {{ errorMessage }}
+  </div>
+
+  <div class="product-page__filter">
+    <label for="product-filter" class="form-label fw-semibold">Filtro</label>
+    <input
+      id="product-filter"
+      type="search"
+      class="form-control"
+      placeholder="Buscar por titulo, descricao ou preco"
+      [(ngModel)]="filter"
+    />
+  </div>
+
+  <div class="table-responsive product-page__table">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th scope="col">Titulo</th>
+          <th scope="col">Descricao</th>
+          <th scope="col" class="text-end">Preco</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="isLoading">
+          <td colspan="3" class="text-center text-muted py-4">
+            Carregando produtos...
+          </td>
+        </tr>
+
+        <tr *ngIf="!isLoading && filteredProducts.length === 0">
+          <td colspan="3" class="text-center text-muted py-4">
+            Nenhum produto encontrado.
+          </td>
+        </tr>
+
+        <tr *ngFor="let product of filteredProducts">
+          <td class="fw-semibold">{{ product.title }}</td>
+          <td>{{ product.description }}</td>
+          <td class="text-end">
+            {{ product.price | currency: 'BRL' : 'symbol' : '1.2-2' }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
