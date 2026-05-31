@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Apollo } from 'apollo-angular';
 import { finalize } from 'rxjs';
 
@@ -25,6 +26,7 @@ export class LoginComponent {
   constructor(
     private readonly formBuilder: FormBuilder,
     private readonly apollo: Apollo,
+    private readonly router: Router,
   ) {}
 
   protected togglePasswordVisibility(): void {
@@ -62,7 +64,10 @@ export class LoginComponent {
       .subscribe({
         next: ({ data }) => {
           this.accessToken = data?.login.accessToken ?? '';
-          console.log(this.accessToken);
+          if (this.accessToken) {
+            localStorage.setItem('accessToken', this.accessToken);
+            void this.router.navigateByUrl('/');
+          }
         },
         error: () => {
           this.errorMessage = 'Email ou senha invalidos';
