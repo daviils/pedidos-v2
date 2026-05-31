@@ -12,6 +12,7 @@ import { AppService } from './app.service';
 import { AuthAdminModule } from './auth-admin/auth-admin.module';
 import { AuthModule } from './auth/auth.module';
 import { ProductModule } from './product/product.module';
+import { UploadModule } from './upload/upload.module';
 import { UserAdminModule } from './user-admin/user-admin.module';
 import { UserModule } from './user/user.module';
 
@@ -50,6 +51,7 @@ if (existsSync(envFilePath)) {
     AuthAdminModule,
     AuthModule,
     ProductModule,
+    UploadModule,
     UserAdminModule,
     UserModule,
   ],
