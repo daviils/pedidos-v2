@@ -38,6 +38,7 @@
     <table class="table table-hover align-middle mb-0">
       <thead>
         <tr>
+          <th scope="col">Imagem</th>
           <th scope="col">Titulo</th>
           <th scope="col">Descricao</th>
           <th scope="col" class="text-end">Preco</th>
@@ -45,13 +46,13 @@
       </thead>
       <tbody>
         <tr *ngIf="isLoading">
-          <td colspan="3" class="text-center text-muted py-4">
+          <td colspan="4" class="text-center text-muted py-4">
             Carregando produtos...
           </td>
         </tr>
 
         <tr *ngIf="!isLoading && filteredProducts.length === 0">
-          <td colspan="3" class="text-center text-muted py-4">
+          <td colspan="4" class="text-center text-muted py-4">
             Nenhum produto encontrado.
           </td>
         </tr>
@@ -61,8 +62,20 @@
           class="product-page__row"
           [routerLink]="['detail', product.id]"
         >
+          <td>
+            <img
+              *ngIf="product.photoUrl"
+              class="product-page__image"
+              [src]="getProductImageUrl(product.photoUrl)"
+              [alt]="product.title"
+            />
+          </td>
           <td class="fw-semibold">{{ product.title }}</td>
-          <td>{{ product.description }}</td>
+          <td>
+            <span class="product-page__description">
+              {{ product.description }}
+            </span>
+          </td>
           <td class="text-end">
             {{ product.price | currency: 'BRL' : 'symbol' : '1.2-2' }}
           </td>

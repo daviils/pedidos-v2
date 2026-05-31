@@ -3,6 +3,7 @@ import {
   Controller,
   Post,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -13,6 +14,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
+import { AuthAdminGuard } from '../../auth-admin/guard/auth-admin.guard';
 import { UploadService } from '../service/upload.service';
 
 type UploadedImageFile = {
@@ -27,6 +29,7 @@ export class UploadController {
   constructor(private readonly uploadService: UploadService) {}
 
   @Post('upload-product')
+  @UseGuards(AuthAdminGuard)
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -47,8 +50,7 @@ export class UploadController {
       properties: {
         url: {
           type: 'string',
-          example:
-            'https://pedidos2.blob.core.windows.net/product-images/products/image.jpg',
+          example: 'image.jpg',
         },
       },
     },

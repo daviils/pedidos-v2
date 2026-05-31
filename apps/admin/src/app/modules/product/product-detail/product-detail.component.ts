@@ -4,13 +4,15 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Apollo } from 'apollo-angular';
 import { finalize, take } from 'rxjs';
 
+import { UploadService } from '../../../core/services/upload.service';
+import { UtilComponent } from '../../../core/util.component';
 import {
   CreateProductDocument,
   type CreateProductInput,
   ProductDocument,
   UpdateProductDocument,
 } from '../../../graphql/generated/graphql';
-import { UtilComponent } from '../../../core/util.component';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-product-detail',
@@ -24,12 +26,16 @@ export class ProductDetailComponent implements OnInit {
   protected productId = '';
   protected isLoading = false;
   protected isSubmitting = false;
+  protected isUploadingPhoto = false;
   protected errorMessage = '';
+  protected selectedPhotoFile: File | null = null;
+  protected photoTouched = false;
 
   constructor(
     private readonly activatedRoute: ActivatedRoute,
     private readonly apollo: Apollo,
     private readonly router: Router,
+    private readonly uploadService: UploadService,
     private readonly utilComponent: UtilComponent,
   ) {
     this.priceFormatted = this.utilComponent.formatMoney(this.product.price);
@@ -44,7 +50,7 @@ export class ProductDetailComponent implements OnInit {
   }
 
   protected submit(form: NgForm): void {
-    if (this.isSubmitting) {
+    if (this.isSubmitting || this.isUploadingPhoto) {
       return;
     }
 
@@ -53,13 +59,34 @@ export class ProductDetailComponent implements OnInit {
       return;
     }
 
+    if (!this.product.photoUrl && !this.selectedPhotoFile) {
+      this.photoTouched = true;
+      return;
+    }
+
     this.saveProduct();
+  }
+
+  protected selectPhoto(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.selectedPhotoFile = input.files?.[0] ?? null;
+    this.photoTouched = true;
+
+    if (!this.selectedPhotoFile) {
+      return;
+    }
+
+    this.uploadSelectedPhoto(this.selectedPhotoFile);
   }
 
   protected formatPrice(value: string): void {
     const { price, priceFormatted } = this.utilComponent.formatPrice(value);
     this.product.price = price;
     this.priceFormatted = priceFormatted;
+  }
+
+  protected get productImageUrl(): string {
+    return `${environment.productImageBaseUrl}${this.product.photoUrl}`;
   }
 
   private saveProduct(): void {
@@ -96,6 +123,7 @@ export class ProductDetailComponent implements OnInit {
           this.product = {
             title: data.product.title,
             description: data.product.description,
+            photoUrl: data.product.photoUrl ?? '',
             price: data.product.price,
           };
           this.priceFormatted = this.utilComponent.formatMoney(
@@ -119,6 +147,7 @@ export class ProductDetailComponent implements OnInit {
           data: {
             title: this.product.title,
             description: this.product.description,
+            photoUrl: this.product.photoUrl,
             price: Number(this.product.price),
           },
         },
@@ -149,6 +178,7 @@ export class ProductDetailComponent implements OnInit {
           data: {
             title: this.product.title,
             description: this.product.description,
+            photoUrl: this.product.photoUrl,
             price: Number(this.product.price),
           },
         },
@@ -167,10 +197,33 @@ export class ProductDetailComponent implements OnInit {
       });
   }
 
+  private uploadSelectedPhoto(file: File): void {
+    this.isUploadingPhoto = true;
+    this.errorMessage = '';
+
+    this.uploadService
+      .uploadProduct(file)
+      .pipe(
+        take(1),
+        finalize(() => (this.isUploadingPhoto = false)),
+      )
+      .subscribe({
+        next: ({ url }) => {
+          this.product.photoUrl = url;
+        },
+        error: () => {
+          this.selectedPhotoFile = null;
+          this.product.photoUrl = '';
+          this.errorMessage = 'Nao foi possivel enviar a imagem do produto';
+        },
+      });
+  }
+
   private createEmptyProduct(): CreateProductInput {
     return {
       title: '',
       description: '',
+      photoUrl: '',
       price: 0,
     };
   }

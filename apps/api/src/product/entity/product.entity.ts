@@ -16,9 +16,9 @@ export class Product {
   @Column()
   description: string;
 
-  @Field(() => String)
-  @Column()
-  photoUrl: string;
+  @Field(() => String, { nullable: true })
+  @Column('nvarchar', { nullable: true })
+  photoUrl: string | null;
 
   @Field(() => Float)
   @Column('decimal', { precision: 10, scale: 2 })

@@ -3,6 +3,7 @@ query Products {
         id
         title
         description
+        photoUrl
         price
     }
 }
@@ -12,6 +13,7 @@ query Product($id: String!) {
         id
         title
         description
+        photoUrl
         price
     }
 }
@@ -21,6 +23,7 @@ mutation CreateProduct($data: CreateProductInput!) {
         id
         title
         description
+        photoUrl
         price
     }
 }
@@ -30,6 +33,7 @@ mutation UpdateProduct($id: String!, $data: UpdateProductInput!) {
         id
         title
         description
+        photoUrl
         price
     }
 }
@@ -39,6 +43,7 @@ mutation DeleteProduct($id: String!) {
         id
         title
         description
+        photoUrl
         price
     }
 }

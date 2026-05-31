@@ -31,11 +31,12 @@ export class UploadService {
 
     const folder = process.env.AZURE_STORAGE_PRODUCT_IMAGES_PATH ?? 'products';
     const extension = extname(file.originalname);
-    const fileName = `${folder}/${randomUUID()}${extension}`;
+    const fileName = `${randomUUID()}${extension}`;
+    const blobName = `${folder}/${fileName}`;
     const blobServiceClient =
       BlobServiceClient.fromConnectionString(connectionString);
     const containerClient = blobServiceClient.getContainerClient(containerName);
-    const blockBlobClient = containerClient.getBlockBlobClient(fileName);
+    const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
     await blockBlobClient.uploadData(file.buffer, {
       blobHTTPHeaders: {
@@ -44,7 +45,7 @@ export class UploadService {
     });
 
     return {
-      url: blockBlobClient.url,
+      url: fileName,
     };
   }
 }

@@ -24,6 +24,7 @@ type Product {
   id: String!
   title: String!
   description: String!
+  photoUrl: String
   price: Float!
 }
 
@@ -82,11 +83,13 @@ input UpdateUserInput {
 input CreateProductInput {
   title: String!
   description: String!
+  photoUrl: String
   price: Float!
 }
 
 input UpdateProductInput {
   title: String
   description: String
+  photoUrl: String
   price: Float
 }

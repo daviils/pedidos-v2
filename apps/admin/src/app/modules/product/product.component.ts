@@ -6,6 +6,7 @@ import {
   ProductsDocument,
   type ProductsQuery,
 } from '../../graphql/generated/graphql';
+import { environment } from '../../../environments/environment';
 
 type Product = ProductsQuery['products'][number];
 
@@ -63,5 +64,9 @@ export class ProductComponent implements OnInit {
           this.errorMessage = 'Nao foi possivel carregar os produtos';
         },
       });
+  }
+
+  protected getProductImageUrl(photoUrl: string): string {
+    return `${environment.productImageBaseUrl}${photoUrl}`;
   }
 }

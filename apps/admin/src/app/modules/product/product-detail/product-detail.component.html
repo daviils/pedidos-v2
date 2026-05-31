@@ -21,6 +21,33 @@
       {{ errorMessage }}
     </div>
 
+    <div class="mb-4">
+      <label for="photo" class="form-label fw-semibold">Imagem</label>
+      <img
+        *ngIf="product.photoUrl"
+        class="product-detail-page__image"
+        [src]="productImageUrl"
+        [alt]="product.title"
+      />
+      <input
+        id="photo"
+        name="photo"
+        type="file"
+        class="form-control"
+        accept="image/*"
+        (change)="selectPhoto($event)"
+      />
+      <div
+        *ngIf="photoTouched && !product.photoUrl && !selectedPhotoFile"
+        class="form-text text-danger"
+      >
+        Informe a imagem do produto.
+      </div>
+      <div *ngIf="isUploadingPhoto" class="form-text text-muted">
+        Enviando imagem...
+      </div>
+    </div>
+
     <div class="mb-3">
       <label for="title" class="form-label fw-semibold">Titulo</label>
       <input
@@ -82,7 +109,11 @@
 
     <div class="product-detail-page__actions">
       <a class="btn btn-outline-secondary" routerLink="/product">Cancelar</a>
-      <button type="submit" class="btn btn-dark" [disabled]="isSubmitting">
+      <button
+        type="submit"
+        class="btn btn-dark"
+        [disabled]="isSubmitting || isUploadingPhoto"
+      >
         {{ isSubmitting ? 'Salvando...' : 'Salvar produto' }}
       </button>
     </div>

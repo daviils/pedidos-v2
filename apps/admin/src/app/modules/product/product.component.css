@@ -52,6 +52,21 @@
   cursor: pointer;
 }
 
+.product-page__image {
+  width: 56px;
+  height: 56px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.product-page__description {
+  display: -webkit-box;
+  max-width: 520px;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
 @media (max-width: 640px) {
   .product-page {
     padding: 20px;

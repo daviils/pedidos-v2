@@ -33,6 +33,15 @@
   justify-content: flex-end;
 }
 
+.product-detail-page__image {
+  display: block;
+  width: 240px;
+  height: 240px;
+  margin: 0 auto 12px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
 @media (max-width: 640px) {
   .product-detail-page {
     padding: 20px;
