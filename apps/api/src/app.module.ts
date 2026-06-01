@@ -11,7 +11,9 @@ import { AppResolver } from './app.resolver';
 import { AppService } from './app.service';
 import { AuthAdminModule } from './auth-admin/auth-admin.module';
 import { AuthModule } from './auth/auth.module';
+import { MercadoPagoModule } from './mercado-pago/mercado-pago.module';
 import { ProductModule } from './product/product.module';
+import { SubscriptionModule } from './subscription/subscription.module';
 import { UploadModule } from './upload/upload.module';
 import { UserAdminModule } from './user-admin/user-admin.module';
 import { UserModule } from './user/user.module';
@@ -50,7 +52,9 @@ if (existsSync(envFilePath)) {
     }),
     AuthAdminModule,
     AuthModule,
+    MercadoPagoModule,
     ProductModule,
+    SubscriptionModule,
     UploadModule,
     UserAdminModule,
     UserModule,

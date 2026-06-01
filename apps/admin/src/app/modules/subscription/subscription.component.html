@@ -1,0 +1,79 @@
+<section class="subscription-page">
+  <div class="subscription-page__header">
+    <div>
+      <h1>Subscriptions</h1>
+      <p>Lista de subscriptions cadastradas.</p>
+    </div>
+
+    <div class="subscription-page__actions">
+      <a class="btn btn-dark" routerLink="create">Criar subscription</a>
+
+      <button
+        type="button"
+        class="btn btn-outline-dark"
+        [disabled]="isLoading"
+        (click)="loadSubscriptions()"
+      >
+        Atualizar
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger py-2">
+    {{ errorMessage }}
+  </div>
+
+  <div class="subscription-page__filter">
+    <label for="subscription-filter" class="form-label fw-semibold">
+      Filtro
+    </label>
+    <input
+      id="subscription-filter"
+      type="search"
+      class="form-control"
+      placeholder="Buscar por titulo, descricao ou preco"
+      [(ngModel)]="filter"
+    />
+  </div>
+
+  <div class="table-responsive subscription-page__table">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th scope="col">Titulo</th>
+          <th scope="col">Descricao</th>
+          <th scope="col" class="text-end">Preco</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="isLoading">
+          <td colspan="3" class="text-center text-muted py-4">
+            Carregando subscriptions...
+          </td>
+        </tr>
+
+        <tr *ngIf="!isLoading && filteredSubscriptions.length === 0">
+          <td colspan="3" class="text-center text-muted py-4">
+            Nenhuma subscription encontrada.
+          </td>
+        </tr>
+
+        <tr
+          *ngFor="let subscription of filteredSubscriptions"
+          class="subscription-page__row"
+          [routerLink]="['detail', subscription.id]"
+        >
+          <td class="fw-semibold">{{ subscription.title }}</td>
+          <td>
+            <span class="subscription-page__description">
+              {{ subscription.description }}
+            </span>
+          </td>
+          <td class="text-end">
+            {{ subscription.price | currency: 'BRL' : 'symbol' : '1.2-2' }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

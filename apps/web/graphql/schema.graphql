@@ -28,6 +28,13 @@ type Product {
   price: Float!
 }
 
+type Subscription {
+  id: String!
+  title: String!
+  description: String!
+  price: Float!
+}
+
 type Query {
   health: String!
   getMeAdmin: UserAdmin!
@@ -38,6 +45,8 @@ type Query {
   user(id: String!): User
   products: [Product!]!
   product(id: String!): Product
+  subscriptions: [Subscription!]!
+  subscription(id: String!): Subscription
 }
 
 type Mutation {
@@ -52,6 +61,9 @@ type Mutation {
   createProduct(data: CreateProductInput!): Product!
   updateProduct(id: String!, data: UpdateProductInput!): Product!
   deleteProduct(id: String!): Product!
+  createSubscription(data: CreateSubscriptionInput!): Subscription!
+  updateSubscription(id: String!, data: UpdateSubscriptionInput!): Subscription!
+  deleteSubscription(id: String!): Subscription!
 }
 
 input CreateUserAdminInput {
@@ -83,7 +95,7 @@ input UpdateUserInput {
 input CreateProductInput {
   title: String!
   description: String!
-  photoUrl: String
+  photoUrl: String!
   price: Float!
 }
 
@@ -91,5 +103,17 @@ input UpdateProductInput {
   title: String
   description: String
   photoUrl: String
+  price: Float
+}
+
+input CreateSubscriptionInput {
+  title: String!
+  description: String!
+  price: Float!
+}
+
+input UpdateSubscriptionInput {
+  title: String
+  description: String
   price: Float
 }

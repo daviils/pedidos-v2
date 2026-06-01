@@ -23,6 +23,13 @@ const routes: Routes = [
           ),
       },
       {
+        path: 'subscription',
+        loadChildren: () =>
+          import('../../modules/subscription/subscription.module').then(
+            (module) => module.SubscriptionModule,
+          ),
+      },
+      {
         path: '',
         pathMatch: 'full',
         redirectTo: 'home',

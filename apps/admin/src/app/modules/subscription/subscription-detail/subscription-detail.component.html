@@ -1,0 +1,100 @@
+<section class="subscription-detail-page">
+  <div class="subscription-detail-page__header">
+    <div>
+      <h1>
+        {{ subscriptionId ? 'Detalhe da subscription' : 'Criar subscription' }}
+      </h1>
+      <p>
+        {{
+          subscriptionId
+            ? 'Visualize os dados da subscription.'
+            : 'Cadastre uma nova subscription.'
+        }}
+      </p>
+    </div>
+
+    <a class="btn btn-outline-dark" routerLink="/subscription">Voltar</a>
+  </div>
+
+  <form
+    class="subscription-detail-page__form"
+    #subscriptionForm="ngForm"
+    (ngSubmit)="submit(subscriptionForm)"
+  >
+    <div *ngIf="isLoading" class="alert alert-secondary py-2">
+      Carregando subscription...
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger py-2">
+      {{ errorMessage }}
+    </div>
+
+    <div class="mb-3">
+      <label for="title" class="form-label fw-semibold">Titulo</label>
+      <input
+        id="title"
+        name="title"
+        type="text"
+        class="form-control"
+        required
+        [(ngModel)]="subscription.title"
+        #title="ngModel"
+      />
+      <div
+        *ngIf="title.invalid && title.touched"
+        class="form-text text-danger"
+      >
+        Informe o titulo da subscription.
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="description" class="form-label fw-semibold">Descricao</label>
+      <textarea
+        id="description"
+        name="description"
+        class="form-control"
+        rows="4"
+        required
+        [(ngModel)]="subscription.description"
+        #description="ngModel"
+      ></textarea>
+      <div
+        *ngIf="description.invalid && description.touched"
+        class="form-text text-danger"
+      >
+        Informe a descricao da subscription.
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <label for="price" class="form-label fw-semibold">Preco</label>
+      <input
+        id="price"
+        name="price"
+        type="text"
+        class="form-control"
+        inputmode="numeric"
+        required
+        [ngModel]="priceFormatted"
+        (ngModelChange)="formatPrice($event)"
+        #price="ngModel"
+      />
+      <div
+        *ngIf="price.invalid && price.touched"
+        class="form-text text-danger"
+      >
+        Informe o preco da subscription.
+      </div>
+    </div>
+
+    <div class="subscription-detail-page__actions">
+      <a class="btn btn-outline-secondary" routerLink="/subscription">
+        Cancelar
+      </a>
+      <button type="submit" class="btn btn-dark" [disabled]="isSubmitting">
+        {{ isSubmitting ? 'Salvando...' : 'Salvar subscription' }}
+      </button>
+    </div>
+  </form>
+</section>

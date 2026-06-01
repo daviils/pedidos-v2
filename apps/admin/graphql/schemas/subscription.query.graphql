@@ -1,0 +1,44 @@
+query Subscriptions {
+    subscriptions {
+        id
+        title
+        description
+        price
+    }
+}
+
+query Subscription($id: String!) {
+    subscription(id: $id) {
+        id
+        title
+        description
+        price
+    }
+}
+
+mutation CreateSubscription($data: CreateSubscriptionInput!) {
+    createSubscription(data: $data) {
+        id
+        title
+        description
+        price
+    }
+}
+
+mutation UpdateSubscription($id: String!, $data: UpdateSubscriptionInput!) {
+    updateSubscription(id: $id, data: $data) {
+        id
+        title
+        description
+        price
+    }
+}
+
+mutation DeleteSubscription($id: String!) {
+    deleteSubscription(id: $id) {
+        id
+        title
+        description
+        price
+    }
+}
