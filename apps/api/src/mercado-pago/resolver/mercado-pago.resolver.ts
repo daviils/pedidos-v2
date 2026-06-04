@@ -3,6 +3,7 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import { CurrentUserAdmin } from '../../auth-admin/decorator/current-user-admin.decorator';
 import { GqlAuthAdminGuard } from '../../auth-admin/guard/gql-auth-admin.guard';
+import { UserAdminSubscriptions } from '../../user-admin/entity/user-admin-subscriptions.entity';
 import { UserAdmin } from '../../user-admin/entity/user-admin.entity';
 import { CreateMercadoPagoPreferenceInput } from '../dtos/create-mercado-pago-preference.input';
 import { MercadoPagoPreference } from '../dtos/mercado-pago-preference.type';
@@ -27,5 +28,13 @@ export class MercadoPagoResolver {
     @CurrentUserAdmin() userAdmin: UserAdmin,
   ): Promise<MercadoPagoPreference> {
     return this.mercadoPagoService.findPendingPreference(userAdmin);
+  }
+
+  @UseGuards(GqlAuthAdminGuard)
+  @Mutation(() => UserAdminSubscriptions)
+  cancelMercadoPagoSubscription(
+    @CurrentUserAdmin() userAdmin: UserAdmin,
+  ): Promise<UserAdminSubscriptions> {
+    return this.mercadoPagoService.cancelSubscription(userAdmin);
   }
 }
