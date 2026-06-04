@@ -1,5 +1,5 @@
 import { UseGuards } from '@nestjs/common';
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import { CurrentUserAdmin } from '../../auth-admin/decorator/current-user-admin.decorator';
 import { GqlAuthAdminGuard } from '../../auth-admin/guard/gql-auth-admin.guard';
@@ -19,5 +19,13 @@ export class MercadoPagoResolver {
     @Args('data') data: CreateMercadoPagoPreferenceInput,
   ): Promise<MercadoPagoPreference> {
     return this.mercadoPagoService.createPreference(userAdmin, data);
+  }
+
+  @UseGuards(GqlAuthAdminGuard)
+  @Query(() => MercadoPagoPreference)
+  pendingMercadoPagoPreference(
+    @CurrentUserAdmin() userAdmin: UserAdmin,
+  ): Promise<MercadoPagoPreference> {
+    return this.mercadoPagoService.findPendingPreference(userAdmin);
   }
 }

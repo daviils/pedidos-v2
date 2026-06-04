@@ -1,12 +1,13 @@
 import {
   BadGatewayException,
+  ConflictException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { createHmac, randomUUID, timingSafeEqual } from 'node:crypto';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 
 import { Subscription } from '../../subscription/entity/subscription.entity';
 import {
@@ -53,6 +54,23 @@ export class MercadoPagoService {
       throw new NotFoundException('Subscription nao encontrada');
     }
 
+    const activeUserAdminSubscription =
+      await this.userAdminSubscriptionsRepository.findOne({
+        where: {
+          userAdminId: userAdmin.id,
+          status: In([
+            UserAdminSubscriptionStatus.Active,
+            UserAdminSubscriptionStatus.Pending,
+          ]),
+        },
+      });
+
+    if (activeUserAdminSubscription) {
+      throw new ConflictException(
+        'Ja existe uma assinatura pendente ou ativa para este usuario',
+      );
+    }
+
     const userAdminSubscription =
       this.userAdminSubscriptionsRepository.create({
         id: randomUUID(),
@@ -72,6 +90,33 @@ export class MercadoPagoService {
 
     userAdminSubscription.mercadoPagoId = preferenceResponse.id;
     await this.userAdminSubscriptionsRepository.save(userAdminSubscription);
+
+    return {
+      id: preferenceResponse.id,
+      initPoint: preferenceResponse.init_point,
+      sandboxInitPoint: preferenceResponse.sandbox_init_point,
+      userAdminSubscriptionId: userAdminSubscription.id,
+    };
+  }
+
+  async findPendingPreference(
+    userAdmin: UserAdmin,
+  ): Promise<MercadoPagoPreference> {
+    const userAdminSubscription =
+      await this.userAdminSubscriptionsRepository.findOne({
+        where: {
+          userAdminId: userAdmin.id,
+          status: UserAdminSubscriptionStatus.Pending,
+        },
+      });
+
+    if (!userAdminSubscription) {
+      throw new NotFoundException('Assinatura pendente nao encontrada');
+    }
+
+    const preferenceResponse = await this.getPreference(
+      userAdminSubscription.mercadoPagoId,
+    );
 
     return {
       id: preferenceResponse.id,
@@ -121,7 +166,8 @@ export class MercadoPagoService {
     data: CreateMercadoPagoPreferenceInput,
   ): Promise<MercadoPagoPreferenceResponse> {
     const backUrls = this.getBackUrls(data);
-    const notificationUrl = data.notificationUrl ?? process.env.MERCADO_PAGO_NOTIFICATION_URL;
+    const notificationUrl =
+      data.notificationUrl ?? process.env.MERCADO_PAGO_NOTIFICATION_URL;
 
     const payload = {
       items: [
@@ -154,6 +200,14 @@ export class MercadoPagoService {
 
   private getPayment(paymentId: string): Promise<MercadoPagoPaymentResponse> {
     return this.request<MercadoPagoPaymentResponse>(`/v1/payments/${paymentId}`);
+  }
+
+  private getPreference(
+    preferenceId: string,
+  ): Promise<MercadoPagoPreferenceResponse> {
+    return this.request<MercadoPagoPreferenceResponse>(
+      `/checkout/preferences/${preferenceId}`,
+    );
   }
 
   private async request<T>(path: string, init?: RequestInit): Promise<T> {
@@ -209,7 +263,15 @@ export class MercadoPagoService {
       return UserAdminSubscriptionStatus.Active;
     }
 
-    if (status === 'cancelled' || status === 'refunded') {
+    if (status === 'expired') {
+      return UserAdminSubscriptionStatus.Expired;
+    }
+
+    if (
+      status === 'cancelled' ||
+      status === 'canceled' ||
+      status === 'refunded'
+    ) {
       return UserAdminSubscriptionStatus.Cancelled;
     }
 
