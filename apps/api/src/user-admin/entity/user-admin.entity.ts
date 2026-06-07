@@ -1,5 +1,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+
+import { UserAdminAddress } from '../../user-admin-address/entity/user-admin-address.entity';
 
 @Entity('user_admins')
 @ObjectType()
@@ -18,4 +20,8 @@ export class UserAdmin {
 
   @Column()
   password: string;
+
+  @Field(() => [UserAdminAddress])
+  @OneToMany(() => UserAdminAddress, (address) => address.userAdmin)
+  addresses: UserAdminAddress[];
 }

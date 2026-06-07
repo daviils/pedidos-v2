@@ -15,6 +15,8 @@ import { MercadoPagoModule } from './mercado-pago/mercado-pago.module';
 import { ProductModule } from './product/product.module';
 import { SubscriptionModule } from './subscription/subscription.module';
 import { UploadModule } from './upload/upload.module';
+import { UserAddressModule } from './user-address/user-address.module';
+import { UserAdminAddressModule } from './user-admin-address/user-admin-address.module';
 import { UserAdminModule } from './user-admin/user-admin.module';
 import { UserModule } from './user/user.module';
 
@@ -56,6 +58,8 @@ if (existsSync(envFilePath)) {
     ProductModule,
     SubscriptionModule,
     UploadModule,
+    UserAddressModule,
+    UserAdminAddressModule,
     UserAdminModule,
     UserModule,
   ],

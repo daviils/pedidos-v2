@@ -1,5 +1,7 @@
 import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+
+import { UserAddress } from '../../user-address/entity/user-address.entity';
 
 export enum UserProfile {
   User = 'user',
@@ -34,4 +36,8 @@ export class User {
 
   @Column()
   password: string;
+
+  @Field(() => [UserAddress])
+  @OneToMany(() => UserAddress, (address) => address.user)
+  addresses: UserAddress[];
 }
