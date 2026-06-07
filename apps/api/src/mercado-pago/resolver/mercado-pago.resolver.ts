@@ -37,4 +37,13 @@ export class MercadoPagoResolver {
   ): Promise<UserAdminSubscriptions> {
     return this.mercadoPagoService.cancelSubscription(userAdmin);
   }
+
+  @UseGuards(GqlAuthAdminGuard)
+  @Mutation(() => MercadoPagoPreference)
+  changeMercadoPagoSubscriptionPlan(
+    @CurrentUserAdmin() userAdmin: UserAdmin,
+    @Args('data') data: CreateMercadoPagoPreferenceInput,
+  ): Promise<MercadoPagoPreference> {
+    return this.mercadoPagoService.changeSubscriptionPlan(userAdmin, data);
+  }
 }

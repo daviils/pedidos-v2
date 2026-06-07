@@ -154,6 +154,75 @@ export class MercadoPagoService {
     return this.userAdminSubscriptionsRepository.save(userAdminSubscription);
   }
 
+  async changeSubscriptionPlan(
+    userAdmin: UserAdmin,
+    data: CreateMercadoPagoPreferenceInput,
+  ): Promise<MercadoPagoPreference> {
+    const currentUserAdminSubscription =
+      await this.userAdminSubscriptionsRepository.findOne({
+        where: {
+          userAdminId: userAdmin.id,
+          status: In([
+            UserAdminSubscriptionStatus.Active,
+            UserAdminSubscriptionStatus.Pending,
+          ]),
+        },
+      });
+
+    if (!currentUserAdminSubscription) {
+      throw new NotFoundException('Assinatura ativa ou pendente nao encontrada');
+    }
+
+    if (currentUserAdminSubscription.subscriptionsId === data.subscriptionId) {
+      throw new ConflictException('Usuario ja esta vinculado a este plano');
+    }
+
+    const subscription = await this.subscriptionRepository.findOne({
+      where: { id: data.subscriptionId },
+    });
+
+    if (!subscription) {
+      throw new NotFoundException('Subscription nao encontrada');
+    }
+
+    await this.cancelMercadoPagoPreapproval(
+      currentUserAdminSubscription.mercadoPagoId,
+    );
+
+    currentUserAdminSubscription.status = UserAdminSubscriptionStatus.Cancelled;
+    await this.userAdminSubscriptionsRepository.save(
+      currentUserAdminSubscription,
+    );
+
+    const nextUserAdminSubscription =
+      this.userAdminSubscriptionsRepository.create({
+        id: randomUUID(),
+        userAdminId: userAdmin.id,
+        subscriptionsId: subscription.id,
+        mercadoPagoId: '',
+        status: UserAdminSubscriptionStatus.Pending,
+      });
+
+    const preapprovalResponse = await this.createMercadoPagoPreapproval(
+      userAdmin,
+      subscription,
+      nextUserAdminSubscription.id,
+      data,
+    );
+
+    nextUserAdminSubscription.mercadoPagoId = preapprovalResponse.id;
+    await this.userAdminSubscriptionsRepository.save(
+      nextUserAdminSubscription,
+    );
+
+    return {
+      id: preapprovalResponse.id,
+      initPoint: preapprovalResponse.init_point,
+      sandboxInitPoint: preapprovalResponse.sandbox_init_point,
+      userAdminSubscriptionId: nextUserAdminSubscription.id,
+    };
+  }
+
   async handleWebhook(
     paymentId: string | undefined,
     type: string | undefined,
@@ -192,7 +261,16 @@ export class MercadoPagoService {
       return;
     }
 
-    userAdminSubscription.status = this.mapPaymentStatus(payment.status);
+    const status = this.mapPaymentStatus(payment.status);
+
+    if (
+      userAdminSubscription.status === UserAdminSubscriptionStatus.Cancelled &&
+      status === UserAdminSubscriptionStatus.Active
+    ) {
+      return;
+    }
+
+    userAdminSubscription.status = status;
     await this.userAdminSubscriptionsRepository.save(userAdminSubscription);
   }
 
