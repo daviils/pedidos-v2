@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
+import { OpenRouteServiceService } from '../../open-route-service/service/open-route-service.service';
 import { CreateUserAdminAddressInput } from '../dtos/create-user-admin-address.input';
 import { UpdateUserAdminAddressInput } from '../dtos/update-user-admin-address.input';
 import { UserAdminAddress } from '../entity/user-admin-address.entity';
@@ -11,14 +12,17 @@ export class UserAdminAddressService {
   constructor(
     @InjectRepository(UserAdminAddress)
     private readonly userAdminAddressRepository: Repository<UserAdminAddress>,
+    private readonly openRouteServiceService: OpenRouteServiceService,
   ) {}
 
   async create(
     userAdminId: string,
     data: CreateUserAdminAddressInput,
   ): Promise<UserAdminAddress> {
+    const coordinates = await this.geocodeAddress(data);
     const userAdminAddress = this.userAdminAddressRepository.create({
       ...data,
+      ...coordinates,
       userAdminId,
     });
 
@@ -50,6 +54,7 @@ export class UserAdminAddressService {
     }
 
     Object.assign(userAdminAddress, data);
+    Object.assign(userAdminAddress, await this.geocodeAddress(userAdminAddress));
 
     return this.userAdminAddressRepository.save(userAdminAddress);
   }
@@ -64,5 +69,39 @@ export class UserAdminAddressService {
     await this.userAdminAddressRepository.remove(userAdminAddress);
 
     return userAdminAddress;
+  }
+
+  private async geocodeAddress(
+    address: Pick<
+      UserAdminAddress,
+      'street' | 'number' | 'neighborhood' | 'city' | 'state' | 'zipCode'
+    >,
+  ): Promise<Pick<UserAdminAddress, 'latitude' | 'longitude'>> {
+    const geocode = await this.openRouteServiceService.geocodeAddress(
+      this.formatAddress(address),
+    );
+
+    return {
+      latitude: geocode.latitude,
+      longitude: geocode.longitude,
+    };
+  }
+
+  private formatAddress(
+    address: Pick<
+      UserAdminAddress,
+      'street' | 'number' | 'neighborhood' | 'city' | 'state' | 'zipCode'
+    >,
+  ): string {
+    return [
+      address.street,
+      address.number,
+      address.neighborhood,
+      address.city,
+      address.state,
+      address.zipCode,
+    ]
+      .filter(Boolean)
+      .join(', ');
   }
 }

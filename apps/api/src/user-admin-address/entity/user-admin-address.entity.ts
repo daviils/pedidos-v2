@@ -1,4 +1,4 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, Float, ObjectType } from '@nestjs/graphql';
 import {
   Column,
   Entity,
@@ -47,6 +47,14 @@ export class UserAdminAddress {
   @Field(() => String)
   @Column()
   zipCode: string;
+
+  @Field(() => Float, { nullable: true })
+  @Column('decimal', { precision: 10, scale: 7, nullable: true })
+  latitude: number | null;
+
+  @Field(() => Float, { nullable: true })
+  @Column('decimal', { precision: 10, scale: 7, nullable: true })
+  longitude: number | null;
 
   @Field(() => UserAdmin)
   @ManyToOne(() => UserAdmin, (userAdmin) => userAdmin.addresses)
