@@ -11,6 +11,7 @@ import { AppResolver } from './app.resolver';
 import { AppService } from './app.service';
 import { AuthAdminModule } from './auth-admin/auth-admin.module';
 import { AuthModule } from './auth/auth.module';
+import { DeliveryFeeModule } from './delivery-fee/delivery-fee.module';
 import { MercadoPagoModule } from './mercado-pago/mercado-pago.module';
 import { OpenRouteServiceModule } from './open-route-service/open-route-service.module';
 import { ProductModule } from './product/product.module';
@@ -55,6 +56,7 @@ if (existsSync(envFilePath)) {
     }),
     AuthAdminModule,
     AuthModule,
+    DeliveryFeeModule,
     MercadoPagoModule,
     OpenRouteServiceModule,
     ProductModule,
