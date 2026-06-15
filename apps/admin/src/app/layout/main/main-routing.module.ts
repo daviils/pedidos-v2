@@ -23,6 +23,13 @@ const routes: Routes = [
           ),
       },
       {
+        path: 'category',
+        loadChildren: () =>
+          import('../../modules/category/category.module').then(
+            (module) => module.CategoryModule,
+          ),
+      },
+      {
         path: 'subscription',
         loadChildren: () =>
           import('../../modules/subscription/subscription.module').then(

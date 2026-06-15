@@ -1,0 +1,25 @@
+:host {
+  display: block;
+}
+
+.category-page {
+  min-height: 100vh;
+  padding: 32px;
+}
+
+.category-page__header h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.category-page__header p {
+  margin: 8px 0 0;
+  color: #64748b;
+}
+
+@media (max-width: 640px) {
+  .category-page {
+    padding: 20px;
+  }
+}
