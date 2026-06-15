@@ -19,15 +19,22 @@ export class ProductService {
       photoUrl: this.getImageName(data.photoUrl),
     });
 
-    return this.productRepository.save(product);
+    const createdProduct = await this.productRepository.save(product);
+
+    return this.findById(createdProduct.id) as Promise<Product>;
   }
 
   findAll(): Promise<Product[]> {
-    return this.productRepository.find();
+    return this.productRepository.find({
+      relations: { category: true },
+    });
   }
 
   findById(id: string): Promise<Product | null> {
-    return this.productRepository.findOne({ where: { id } });
+    return this.productRepository.findOne({
+      where: { id },
+      relations: { category: true },
+    });
   }
 
   async update(id: string, data: UpdateProductInput): Promise<Product> {
@@ -43,7 +50,9 @@ export class ProductService {
       product.photoUrl = this.getImageName(data.photoUrl);
     }
 
-    return this.productRepository.save(product);
+    await this.productRepository.save(product);
+
+    return this.findById(id) as Promise<Product>;
   }
 
   async delete(id: string): Promise<Product> {

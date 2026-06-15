@@ -29,7 +29,7 @@ export class UserAdminAddress {
   number: string;
 
   @Field(() => String, { nullable: true })
-  @Column({ nullable: true })
+  @Column('nvarchar', { nullable: true })
   complement: string | null;
 
   @Field(() => String)
