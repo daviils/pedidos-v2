@@ -2,7 +2,89 @@
   <div class="category-page__header">
     <div>
       <h1>Categorias</h1>
-      <p>Modulo de categorias.</p>
+      <p>Lista de categorias cadastradas.</p>
     </div>
+
+    <div class="category-page__actions">
+      <a class="btn btn-dark" routerLink="create">Criar categoria</a>
+
+      <button
+        type="button"
+        class="btn btn-outline-dark"
+        [disabled]="isLoading"
+        (click)="loadCategories()"
+      >
+        Atualizar
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger py-2">
+    {{ errorMessage }}
+  </div>
+
+  <div class="category-page__filter">
+    <label for="category-filter" class="form-label fw-semibold">Filtro</label>
+    <input
+      id="category-filter"
+      type="search"
+      class="form-control"
+      placeholder="Buscar por titulo ou descricao"
+      [(ngModel)]="filter"
+    />
+  </div>
+
+  <div class="table-responsive category-page__table">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th scope="col">Titulo</th>
+          <th scope="col">Descricao</th>
+          <th scope="col" class="text-end">Acoes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="isLoading">
+          <td colspan="3" class="text-center text-muted py-4">
+            Carregando categorias...
+          </td>
+        </tr>
+
+        <tr *ngIf="!isLoading && filteredCategories.length === 0">
+          <td colspan="3" class="text-center text-muted py-4">
+            Nenhuma categoria encontrada.
+          </td>
+        </tr>
+
+        <tr
+          *ngFor="let category of filteredCategories"
+          class="category-page__row"
+        >
+          <td class="fw-semibold">{{ category.title }}</td>
+          <td>
+            <span class="category-page__description">
+              {{ category.description }}
+            </span>
+          </td>
+          <td class="text-end">
+            <a
+              class="btn btn-sm btn-outline-dark me-2"
+              [routerLink]="['edit', category.id]"
+              title="Editar"
+            >
+              <span class="material-icons align-middle fs-6">edit</span>
+            </a>
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-danger"
+              (click)="deleteCategory(category.id)"
+              title="Excluir"
+            >
+              <span class="material-icons align-middle fs-6">delete</span>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </section>

@@ -20,7 +20,7 @@ export class CategoryResolver {
     return this.categoryService.create(data);
   }
 
-  @UseGuards(GqlAuthAdminGuard, GqlAuthGuard)
+  @UseGuards(GqlAuthAdminGuard)
   @Query(() => [Category])
   categories(): Promise<Category[]> {
     return this.categoryService.findAll();

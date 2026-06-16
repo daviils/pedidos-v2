@@ -1,0 +1,73 @@
+<section class="category-detail-page">
+  <div class="category-detail-page__header">
+    <div>
+      <h1>{{ categoryId ? 'Editar categoria' : 'Criar categoria' }}</h1>
+      <p>{{ categoryId ? 'Altere os dados da categoria.' : 'Cadastre uma nova categoria.' }}</p>
+    </div>
+
+    <a class="btn btn-outline-dark" routerLink="/category">Voltar</a>
+  </div>
+
+  <form
+    class="category-detail-page__form"
+    #categoryForm="ngForm"
+    (ngSubmit)="submit(categoryForm)"
+  >
+    <div *ngIf="isLoading" class="alert alert-secondary py-2">
+      Carregando categoria...
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger py-2">
+      {{ errorMessage }}
+    </div>
+
+    <div class="mb-3">
+      <label for="title" class="form-label fw-semibold">Titulo</label>
+      <input
+        id="title"
+        name="title"
+        type="text"
+        class="form-control"
+        required
+        [(ngModel)]="category.title"
+        #title="ngModel"
+      />
+      <div
+        *ngIf="title.invalid && title.touched"
+        class="form-text text-danger"
+      >
+        Informe o titulo da categoria.
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="description" class="form-label fw-semibold">Descricao</label>
+      <textarea
+        id="description"
+        name="description"
+        class="form-control"
+        rows="4"
+        required
+        [(ngModel)]="category.description"
+        #description="ngModel"
+      ></textarea>
+      <div
+        *ngIf="description.invalid && description.touched"
+        class="form-text text-danger"
+      >
+        Informe a descricao da categoria.
+      </div>
+    </div>
+
+    <div class="category-detail-page__actions">
+      <a class="btn btn-outline-secondary" routerLink="/category">Cancelar</a>
+      <button
+        type="submit"
+        class="btn btn-dark"
+        [disabled]="isSubmitting"
+      >
+        {{ isSubmitting ? 'Salvando...' : 'Salvar categoria' }}
+      </button>
+    </div>
+  </form>
+</section>

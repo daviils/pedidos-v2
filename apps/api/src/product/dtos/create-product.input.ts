@@ -14,6 +14,6 @@ export class CreateProductInput {
   @Field(() => Float)
   price: number;
 
-  @Field(() => String)
-  categoryId: string;
+  @Field(() => String, { nullable: true })
+  categoryId?: string;
 }
