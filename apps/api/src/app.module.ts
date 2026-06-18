@@ -15,6 +15,7 @@ import { CategoryModule } from './category/category.module';
 import { DeliveryFeeModule } from './delivery-fee/delivery-fee.module';
 import { MercadoPagoModule } from './mercado-pago/mercado-pago.module';
 import { OpenRouteServiceModule } from './open-route-service/open-route-service.module';
+import { OrderModule } from './order/order.module';
 import { ProductModule } from './product/product.module';
 import { SubscriptionModule } from './subscription/subscription.module';
 import { TableModule } from './table/table.module';
@@ -62,6 +63,7 @@ if (existsSync(envFilePath)) {
     DeliveryFeeModule,
     MercadoPagoModule,
     OpenRouteServiceModule,
+    OrderModule,
     ProductModule,
     SubscriptionModule,
     TableModule,

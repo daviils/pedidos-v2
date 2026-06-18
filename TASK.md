@@ -4,7 +4,7 @@
 - criar um crud de mesa (id,name,status)
 
 ## ORDER
-- crud de order(id, productId,tableId, createdAt, updatedAt, deletedAt)
+- crud de order(id, productId, tableId, createdAt, updatedAt, deletedAt)
 - ao criar order criar table_session
 
 ## TABLE_SESSION
