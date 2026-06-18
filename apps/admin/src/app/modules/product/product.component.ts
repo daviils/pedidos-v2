@@ -4,6 +4,7 @@ import { finalize, take } from 'rxjs';
 
 import {
   ProductsDocument,
+  DeleteProductDocument,
   type ProductsQuery,
 } from '../../graphql/generated/graphql';
 import { environment } from '../../../environments/environment';
@@ -40,8 +41,28 @@ export class ProductComponent implements OnInit {
         product.title,
         product.description,
         product.price.toString(),
+        product.category?.title ?? '',
       ].some((value) => value.toLowerCase().includes(search)),
     );
+  }
+
+  protected deleteProduct(id: string): void {
+    this.errorMessage = '';
+
+    this.apollo
+      .mutate({
+        mutation: DeleteProductDocument,
+        variables: { id },
+      })
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this.products = this.products.filter((p) => p.id !== id);
+        },
+        error: () => {
+          this.errorMessage = 'Nao foi possivel excluir o produto';
+        },
+      });
   }
 
   protected loadProducts(): void {

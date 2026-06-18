@@ -1,0 +1,53 @@
+<section class="table-detail-page">
+  <div class="table-detail-page__header">
+    <div>
+      <h1>{{ tableId ? 'Editar mesa' : 'Criar mesa' }}</h1>
+      <p>{{ tableId ? 'Altere os dados da mesa.' : 'Cadastre uma nova mesa.' }}</p>
+    </div>
+
+    <a class="btn btn-outline-dark" routerLink="/table">Voltar</a>
+  </div>
+
+  <form
+    class="table-detail-page__form"
+    #tableForm="ngForm"
+    (ngSubmit)="submit(tableForm)"
+  >
+    <div *ngIf="isLoading" class="alert alert-secondary py-2">
+      Carregando mesa...
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger py-2">
+      {{ errorMessage }}
+    </div>
+
+    <div class="mb-3">
+      <label for="name" class="form-label fw-semibold">Nome</label>
+      <input
+        id="name"
+        name="name"
+        type="text"
+        class="form-control"
+        required
+        [(ngModel)]="table.name"
+        #name="ngModel"
+      />
+      <div
+        *ngIf="name.invalid && name.touched"
+        class="form-text text-danger"
+      >
+        Informe o nome da mesa.
+      </div>
+    </div>
+    <div class="table-detail-page__actions">
+      <a class="btn btn-outline-secondary" routerLink="/table">Cancelar</a>
+      <button
+        type="submit"
+        class="btn btn-dark"
+        [disabled]="isSubmitting"
+      >
+        {{ isSubmitting ? 'Salvando...' : 'Salvar mesa' }}
+      </button>
+    </div>
+  </form>
+</section>

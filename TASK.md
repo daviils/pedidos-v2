@@ -1,9 +1,14 @@
 # FLUXO DE TASK
 
-## CATEGORY
-- criar modulo de category (api)
-- criar crud de category
-- criar product_category
-- criar relação varios para um product -> product_category
-- adicionar category no create e update de product
-- criar lista de product_category com leftjoin de product
+## MESA / TABLE
+- criar um crud de mesa (id,name,status)
+
+## ORDER
+- crud de order(id, productId,tableId, createdAt, updatedAt, deletedAt)
+- ao criar order criar table_session
+
+## TABLE_SESSION
+- inicia sessão (id,status,createdAt,tableId,orderId)
+- se table está close ao fazer pedido, passa a ficar open e cria um novo table session
+- ao solicitar pedido de conta table volta para close
+

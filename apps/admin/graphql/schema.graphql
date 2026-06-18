@@ -1,98 +1,18 @@
-type DeliveryFee {
-  id: String!
-  userAdminId: String!
-  distance: Float!
-  value: Float!
-  userAdmin: UserAdmin!
-}
 
-type UserAdminAddress {
-  id: String!
-  userAdminId: String!
-  street: String!
-  number: String!
-  complement: String
-  neighborhood: String!
-  city: String!
-  state: String!
-  zipCode: String!
-  latitude: Float
-  longitude: Float
-  userAdmin: UserAdmin!
-}
+"""Exposes a URL that specifies the behavior of this scalar."""
+directive @specifiedBy(
+  """The URL that specifies the behavior of this scalar."""
+  url: String!
+) on SCALAR
 
-type UserAdmin {
-  id: String!
-  email: String!
-  name: String!
-  addresses: [UserAdminAddress!]!
-  deliveryFees: [DeliveryFee!]!
-}
-
-type Subscription {
-  id: String!
-  title: String!
-  description: String!
-  price: Float!
-}
-
-type UserAdminSubscriptions {
-  id: String!
-  userAdminId: String!
-  mercadoPagoId: String!
-  subscriptionsId: String!
-  status: UserAdminSubscriptionStatus!
-  userAdmin: UserAdmin!
-  subscription: Subscription!
-}
-
-enum UserAdminSubscriptionStatus {
-  Active
-  Pending
-  Cancelled
-  Expired
-}
+"""
+Indicates exactly one field must be supplied and this field must not be `null`.
+"""
+directive @oneOf on INPUT_OBJECT
 
 type AuthToken {
   accessToken: String!
   tokenType: String!
-}
-
-type UserAddress {
-  id: String!
-  userId: String!
-  street: String!
-  number: String!
-  complement: String
-  neighborhood: String!
-  city: String!
-  state: String!
-  zipCode: String!
-  latitude: Float
-  longitude: Float
-  user: User!
-}
-
-type User {
-  id: String!
-  email: String!
-  name: String!
-  profile: UserProfile!
-  addresses: [UserAddress!]!
-}
-
-enum UserProfile {
-  User
-}
-
-type Product {
-  id: String!
-  title: String!
-  description: String!
-  photoUrl: String
-  price: Float!
-  categoryId: String
-  category: Category!
 }
 
 type Category {
@@ -105,36 +25,89 @@ type Category {
   products: [Product!]!
 }
 
+input CreateCategoryInput {
+  title: String!
+  description: String!
+}
+
+input CreateDeliveryFeeInput {
+  distance: Float!
+  value: Float!
+}
+
+input CreateMercadoPagoPreferenceInput {
+  subscriptionId: String!
+  successUrl: String
+  failureUrl: String
+  pendingUrl: String
+  notificationUrl: String
+}
+
+input CreateProductInput {
+  title: String!
+  description: String!
+  photoUrl: String!
+  price: Float!
+  categoryId: String
+}
+
+input CreateSubscriptionInput {
+  title: String!
+  description: String!
+  price: Float!
+}
+
+input CreateUserAddressInput {
+  street: String!
+  number: String!
+  complement: String
+  neighborhood: String!
+  city: String!
+  state: String!
+  zipCode: String!
+}
+
+input CreateUserAdminAddressInput {
+  street: String!
+  number: String!
+  complement: String
+  neighborhood: String!
+  city: String!
+  state: String!
+  zipCode: String!
+}
+
+input CreateUserAdminInput {
+  email: String!
+  name: String!
+  password: String!
+}
+
+input CreateUserInput {
+  email: String!
+  name: String!
+  password: String!
+  profile: UserProfile
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
 scalar DateTime
+
+type DeliveryFee {
+  id: String!
+  userAdminId: String!
+  distance: Float!
+  value: Float!
+  userAdmin: UserAdmin!
+}
 
 type MercadoPagoPreference {
   id: String!
   initPoint: String!
   sandboxInitPoint: String
   userAdminSubscriptionId: String!
-}
-
-type Query {
-  health: String!
-  getMeAdmin: UserAdmin!
-  usersAdmin: [UserAdmin!]!
-  userAdmin(id: String!): UserAdmin
-  me: User!
-  users: [User!]!
-  user(id: String!): User
-  categories: [Category!]!
-  category(id: String!): Category
-  deliveryFees: [DeliveryFee!]!
-  deliveryFee(id: String!): DeliveryFee
-  pendingMercadoPagoPreference: MercadoPagoPreference!
-  products: [Product!]!
-  product(id: String!): Product
-  subscriptions: [Subscription!]!
-  subscription(id: String!): Subscription
-  userAddresses: [UserAddress!]!
-  userAddress(id: String!): UserAddress
-  userAdminAddresses: [UserAdminAddress!]!
-  userAdminAddress(id: String!): UserAdminAddress
 }
 
 type Mutation {
@@ -169,35 +142,44 @@ type Mutation {
   deleteUserAdminAddress(id: String!): UserAdminAddress!
 }
 
-input CreateUserAdminInput {
-  email: String!
-  name: String!
-  password: String!
-}
-
-input UpdateUserAdminInput {
-  email: String
-  name: String
-  password: String
-}
-
-input CreateUserInput {
-  email: String!
-  name: String!
-  password: String!
-  profile: UserProfile
-}
-
-input UpdateUserInput {
-  email: String
-  name: String
-  password: String
-  profile: UserProfile
-}
-
-input CreateCategoryInput {
+type Product {
+  id: String!
   title: String!
   description: String!
+  photoUrl: String
+  price: Float!
+  categoryId: String!
+  category: Category!
+}
+
+type Query {
+  health: String!
+  getMeAdmin: UserAdmin!
+  usersAdmin: [UserAdmin!]!
+  userAdmin(id: String!): UserAdmin
+  me: User!
+  users: [User!]!
+  user(id: String!): User
+  categories: [Category!]!
+  category(id: String!): Category
+  deliveryFees: [DeliveryFee!]!
+  deliveryFee(id: String!): DeliveryFee
+  pendingMercadoPagoPreference: MercadoPagoPreference!
+  products: [Product!]!
+  product(id: String!): Product
+  subscriptions: [Subscription!]!
+  subscription(id: String!): Subscription
+  userAddresses: [UserAddress!]!
+  userAddress(id: String!): UserAddress
+  userAdminAddresses: [UserAdminAddress!]!
+  userAdminAddress(id: String!): UserAdminAddress
+}
+
+type Subscription {
+  id: String!
+  title: String!
+  description: String!
+  price: Float!
 }
 
 input UpdateCategoryInput {
@@ -205,30 +187,9 @@ input UpdateCategoryInput {
   description: String
 }
 
-input CreateDeliveryFeeInput {
-  distance: Float!
-  value: Float!
-}
-
 input UpdateDeliveryFeeInput {
   distance: Float
   value: Float
-}
-
-input CreateMercadoPagoPreferenceInput {
-  subscriptionId: String!
-  successUrl: String
-  failureUrl: String
-  pendingUrl: String
-  notificationUrl: String
-}
-
-input CreateProductInput {
-  title: String!
-  description: String!
-  photoUrl: String!
-  price: Float!
-  categoryId: String
 }
 
 input UpdateProductInput {
@@ -239,26 +200,10 @@ input UpdateProductInput {
   categoryId: String
 }
 
-input CreateSubscriptionInput {
-  title: String!
-  description: String!
-  price: Float!
-}
-
 input UpdateSubscriptionInput {
   title: String
   description: String
   price: Float
-}
-
-input CreateUserAddressInput {
-  street: String!
-  number: String!
-  complement: String
-  neighborhood: String!
-  city: String!
-  state: String!
-  zipCode: String!
 }
 
 input UpdateUserAddressInput {
@@ -271,16 +216,6 @@ input UpdateUserAddressInput {
   zipCode: String
 }
 
-input CreateUserAdminAddressInput {
-  street: String!
-  number: String!
-  complement: String
-  neighborhood: String!
-  city: String!
-  state: String!
-  zipCode: String!
-}
-
 input UpdateUserAdminAddressInput {
   street: String
   number: String
@@ -289,4 +224,84 @@ input UpdateUserAdminAddressInput {
   city: String
   state: String
   zipCode: String
+}
+
+input UpdateUserAdminInput {
+  email: String
+  name: String
+  password: String
+}
+
+input UpdateUserInput {
+  email: String
+  name: String
+  password: String
+  profile: UserProfile
+}
+
+type User {
+  id: String!
+  email: String!
+  name: String!
+  profile: UserProfile!
+  addresses: [UserAddress!]!
+}
+
+type UserAddress {
+  id: String!
+  userId: String!
+  street: String!
+  number: String!
+  complement: String
+  neighborhood: String!
+  city: String!
+  state: String!
+  zipCode: String!
+  latitude: Float
+  longitude: Float
+  user: User!
+}
+
+type UserAdmin {
+  id: String!
+  email: String!
+  name: String!
+  addresses: [UserAdminAddress!]!
+  deliveryFees: [DeliveryFee!]!
+}
+
+type UserAdminAddress {
+  id: String!
+  userAdminId: String!
+  street: String!
+  number: String!
+  complement: String
+  neighborhood: String!
+  city: String!
+  state: String!
+  zipCode: String!
+  latitude: Float
+  longitude: Float
+  userAdmin: UserAdmin!
+}
+
+type UserAdminSubscriptions {
+  id: String!
+  userAdminId: String!
+  mercadoPagoId: String!
+  subscriptionsId: String!
+  status: UserAdminSubscriptionStatus!
+  userAdmin: UserAdmin!
+  subscription: Subscription!
+}
+
+enum UserAdminSubscriptionStatus {
+  Active
+  Pending
+  Cancelled
+  Expired
+}
+
+enum UserProfile {
+  User
 }

@@ -12,6 +12,8 @@ import { MeDocument } from '../../graphql/generated/graphql';
   styleUrl: './main.component.css',
 })
 export class MainComponent implements OnInit {
+  protected sidebarCollapsed = false;
+
   constructor(
     private readonly apollo: Apollo,
     private readonly router: Router,

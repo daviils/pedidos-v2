@@ -1,0 +1,29 @@
+<aside class="sidebar" [class.sidebar--collapsed]="collapsed">
+  <div class="sidebar__brand">
+    <span class="material-icons sidebar__brand-icon">admin_panel_settings</span>
+    <span class="sidebar__brand-text" *ngIf="!collapsed">Admin</span>
+  </div>
+
+  <button type="button" class="sidebar__toggle" (click)="toggle()">
+    <span class="material-icons">chevron_left</span>
+  </button>
+
+  <nav class="sidebar__nav">
+    <a
+      *ngFor="let route of routes"
+      class="sidebar__link"
+      [class.sidebar__link--active]="isActive(route.path)"
+      [routerLink]="route.path"
+    >
+      <span class="material-icons sidebar__link-icon">{{ route.icon }}</span>
+      <span class="sidebar__link-label" *ngIf="!collapsed">{{ route.label }}</span>
+    </a>
+  </nav>
+
+  <div class="sidebar__footer">
+    <button type="button" class="sidebar__link sidebar__link--logout" (click)="logout()">
+      <span class="material-icons sidebar__link-icon">logout</span>
+      <span class="sidebar__link-label" *ngIf="!collapsed">Sair</span>
+    </button>
+  </div>
+</aside>

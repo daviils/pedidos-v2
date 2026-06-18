@@ -37,6 +37,13 @@ const routes: Routes = [
           ),
       },
       {
+        path: 'table',
+        loadChildren: () =>
+          import('../../modules/table/table.module').then(
+            (module) => module.TableModule,
+          ),
+      },
+      {
         path: '',
         pathMatch: 'full',
         redirectTo: 'home',

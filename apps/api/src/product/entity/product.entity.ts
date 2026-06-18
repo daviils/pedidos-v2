@@ -32,9 +32,9 @@ export class Product {
   @Column('decimal', { precision: 10, scale: 2 })
   price: number;
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   @Column({ nullable: true })
-  categoryId: string;
+  categoryId: string | null;
 
   @Field(() => Category)
   @ManyToOne(() => Category, (category) => category.products)

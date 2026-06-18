@@ -86,6 +86,29 @@
       </div>
     </div>
 
+    <div class="mb-3">
+      <label for="category" class="form-label fw-semibold">Categoria</label>
+      <select
+        id="category"
+        name="category"
+        class="form-select"
+        required
+        [(ngModel)]="product.categoryId"
+        #category="ngModel"
+      >
+        <option [ngValue]="null" disabled>Selecione uma categoria</option>
+        <option *ngFor="let cat of categories" [ngValue]="cat.id">
+          {{ cat.title }}
+        </option>
+      </select>
+      <div
+        *ngIf="category.invalid && category.touched"
+        class="form-text text-danger"
+      >
+        Selecione uma categoria.
+      </div>
+    </div>
+
     <div class="mb-4">
       <label for="price" class="form-label fw-semibold">Preco</label>
       <input

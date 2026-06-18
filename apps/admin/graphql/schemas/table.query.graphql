@@ -1,0 +1,51 @@
+query Tables {
+    tables {
+        id
+        name
+        status
+        createdAt
+        updatedAt
+        deletedAt
+    }
+}
+
+query Table($id: String!) {
+    table(id: $id) {
+        id
+        name
+        status
+        createdAt
+        updatedAt
+        deletedAt
+    }
+}
+
+mutation CreateTable($data: CreateTableInput!) {
+    createTable(data: $data) {
+        id
+        name
+        status
+        createdAt
+        updatedAt
+        deletedAt
+    }
+}
+
+mutation UpdateTable($id: String!, $data: UpdateTableInput!) {
+    updateTable(id: $id, data: $data) {
+        id
+        name
+        status
+        createdAt
+        updatedAt
+        deletedAt
+    }
+}
+
+mutation DeleteTable($id: String!) {
+    deleteTable(id: $id) {
+        id
+        name
+        status
+    }
+}

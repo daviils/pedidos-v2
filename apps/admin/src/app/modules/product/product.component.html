@@ -41,18 +41,20 @@
           <th scope="col">Imagem</th>
           <th scope="col">Titulo</th>
           <th scope="col">Descricao</th>
+          <th scope="col">Categoria</th>
           <th scope="col" class="text-end">Preco</th>
+          <th scope="col" class="text-end">Acoes</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngIf="isLoading">
-          <td colspan="4" class="text-center text-muted py-4">
+          <td colspan="6" class="text-center text-muted py-4">
             Carregando produtos...
           </td>
         </tr>
 
         <tr *ngIf="!isLoading && filteredProducts.length === 0">
-          <td colspan="4" class="text-center text-muted py-4">
+          <td colspan="6" class="text-center text-muted py-4">
             Nenhum produto encontrado.
           </td>
         </tr>
@@ -60,7 +62,6 @@
         <tr
           *ngFor="let product of filteredProducts"
           class="product-page__row"
-          [routerLink]="['detail', product.id]"
         >
           <td>
             <img
@@ -76,8 +77,26 @@
               {{ product.description }}
             </span>
           </td>
+          <td>{{ product.category?.title ?? '-' }}</td>
           <td class="text-end">
             {{ product.price | currency: 'BRL' : 'symbol' : '1.2-2' }}
+          </td>
+          <td class="text-end">
+            <a
+              class="btn btn-sm btn-outline-dark me-2"
+              [routerLink]="['detail', product.id]"
+              title="Editar"
+            >
+              <span class="material-icons align-middle fs-6">edit</span>
+            </a>
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-danger"
+              (click)="deleteProduct(product.id)"
+              title="Excluir"
+            >
+              <span class="material-icons align-middle fs-6">delete</span>
+            </button>
           </td>
         </tr>
       </tbody>

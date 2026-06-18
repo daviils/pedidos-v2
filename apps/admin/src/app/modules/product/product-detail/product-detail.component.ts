@@ -7,12 +7,19 @@ import { finalize, take } from 'rxjs';
 import { UploadService } from '../../../core/services/upload.service';
 import { UtilComponent } from '../../../core/util.component';
 import {
+  CategoriesDocument,
   CreateProductDocument,
   type CreateProductInput,
   ProductDocument,
   UpdateProductDocument,
 } from '../../../graphql/generated/graphql';
 import { environment } from '../../../../environments/environment';
+
+interface Category {
+  id: string;
+  title: string;
+  description: string;
+}
 
 @Component({
   selector: 'app-product-detail',
@@ -30,6 +37,7 @@ export class ProductDetailComponent implements OnInit {
   protected errorMessage = '';
   protected selectedPhotoFile: File | null = null;
   protected photoTouched = false;
+  protected categories: Category[] = [];
 
   constructor(
     private readonly activatedRoute: ActivatedRoute,
@@ -43,6 +51,8 @@ export class ProductDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.productId = this.activatedRoute.snapshot.paramMap.get('id') ?? '';
+
+    this.loadCategories();
 
     if (this.productId) {
       this.loadProduct(this.productId);
@@ -125,6 +135,7 @@ export class ProductDetailComponent implements OnInit {
             description: data.product.description,
             photoUrl: data.product.photoUrl ?? '',
             price: data.product.price,
+            categoryId: data.product.categoryId,
           };
           this.priceFormatted = this.utilComponent.formatMoney(
             data.product.price,
@@ -149,6 +160,7 @@ export class ProductDetailComponent implements OnInit {
             description: this.product.description,
             photoUrl: this.product.photoUrl,
             price: Number(this.product.price),
+            categoryId: this.product.categoryId || null,
           },
         },
       })
@@ -180,6 +192,7 @@ export class ProductDetailComponent implements OnInit {
             description: this.product.description,
             photoUrl: this.product.photoUrl,
             price: Number(this.product.price),
+            categoryId: this.product.categoryId || null,
           },
         },
       })
@@ -225,6 +238,20 @@ export class ProductDetailComponent implements OnInit {
       description: '',
       photoUrl: '',
       price: 0,
+      categoryId: null,
     };
+  }
+
+  private loadCategories(): void {
+    this.apollo
+      .query({
+        query: CategoriesDocument,
+      })
+      .pipe(take(1))
+      .subscribe({
+        next: ({ data }) => {
+          this.categories = data!.categories;
+        },
+      });
   }
 }

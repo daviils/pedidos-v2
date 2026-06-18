@@ -1,0 +1,25 @@
+<aside class="sidebar">
+  <div class="sidebar__brand">
+    <span class="material-symbols-outlined sidebar__brand-icon">store</span>
+    <span class="sidebar__brand-text">Pedidos</span>
+  </div>
+
+  <nav class="sidebar__nav">
+    <a
+      *ngFor="let route of routes"
+      class="sidebar__link"
+      [class.sidebar__link--active]="isActive(route.path)"
+      [routerLink]="route.path"
+    >
+      <span class="material-symbols-outlined sidebar__link-icon">{{ route.icon }}</span>
+      <span class="sidebar__link-label">{{ route.label }}</span>
+    </a>
+  </nav>
+
+  <div class="sidebar__footer">
+    <button type="button" class="sidebar__link sidebar__link--logout" (click)="logout()">
+      <span class="material-symbols-outlined sidebar__link-icon">logout</span>
+      <span class="sidebar__link-label">Sair</span>
+    </button>
+  </div>
+</aside>

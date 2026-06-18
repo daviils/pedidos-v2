@@ -1,0 +1,94 @@
+<section class="table-page">
+  <div class="table-page__header">
+    <div>
+      <h1>Mesas</h1>
+      <p>Lista de mesas cadastradas.</p>
+    </div>
+
+    <div class="table-page__actions">
+      <a class="btn btn-dark" routerLink="create">Criar mesa</a>
+
+      <button
+        type="button"
+        class="btn btn-outline-dark"
+        [disabled]="isLoading"
+        (click)="loadTables()"
+      >
+        Atualizar
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger py-2">
+    {{ errorMessage }}
+  </div>
+
+  <div class="table-page__filter">
+    <label for="table-filter" class="form-label fw-semibold">Filtro</label>
+    <input
+      id="table-filter"
+      type="search"
+      class="form-control"
+      placeholder="Buscar por nome ou status"
+      [(ngModel)]="filter"
+    />
+  </div>
+
+  <div class="table-responsive table-page__table">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th scope="col">Nome</th>
+          <th scope="col">Status</th>
+          <th scope="col" class="text-end">Acoes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="isLoading">
+          <td colspan="3" class="text-center text-muted py-4">
+            Carregando mesas...
+          </td>
+        </tr>
+
+        <tr *ngIf="!isLoading && filteredTables.length === 0">
+          <td colspan="3" class="text-center text-muted py-4">
+            Nenhuma mesa encontrada.
+          </td>
+        </tr>
+
+        <tr
+          *ngFor="let table of filteredTables"
+          class="table-page__row"
+        >
+          <td class="fw-semibold">{{ table.name }}</td>
+          <td>
+            <span
+              class="badge"
+              [class.bg-success]="table.status === 'Open'"
+              [class.bg-secondary]="table.status === 'Close'"
+            >
+              {{ table.status === 'Open' ? 'Aberta' : 'Fechada' }}
+            </span>
+          </td>
+          <td class="text-end">
+            <a
+              class="btn btn-sm btn-outline-dark me-2"
+              [routerLink]="['edit', table.id]"
+              title="Editar"
+            >
+              <span class="material-icons align-middle fs-6">edit</span>
+            </a>
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-danger"
+              (click)="deleteTable(table.id)"
+              title="Excluir"
+            >
+              <span class="material-icons align-middle fs-6">delete</span>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

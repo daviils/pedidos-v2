@@ -17,6 +17,7 @@ import { MercadoPagoModule } from './mercado-pago/mercado-pago.module';
 import { OpenRouteServiceModule } from './open-route-service/open-route-service.module';
 import { ProductModule } from './product/product.module';
 import { SubscriptionModule } from './subscription/subscription.module';
+import { TableModule } from './table/table.module';
 import { UploadModule } from './upload/upload.module';
 import { UserAddressModule } from './user-address/user-address.module';
 import { UserAdminAddressModule } from './user-admin-address/user-admin-address.module';
@@ -63,6 +64,7 @@ if (existsSync(envFilePath)) {
     OpenRouteServiceModule,
     ProductModule,
     SubscriptionModule,
+    TableModule,
     UploadModule,
     UserAddressModule,
     UserAdminAddressModule,

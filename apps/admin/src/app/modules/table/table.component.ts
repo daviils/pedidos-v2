@@ -1,0 +1,83 @@
+import { Component, OnInit } from '@angular/core';
+import { Apollo } from 'apollo-angular';
+import { finalize, take } from 'rxjs';
+
+import {
+  TablesDocument,
+  DeleteTableDocument,
+  type TablesQuery,
+} from '../../graphql/generated/graphql';
+
+type Table = TablesQuery['tables'][number];
+
+@Component({
+  selector: 'app-table',
+  standalone: false,
+  templateUrl: './table.component.html',
+  styleUrl: './table.component.css',
+})
+export class TableComponent implements OnInit {
+  protected tables: Table[] = [];
+  protected filter = '';
+  protected isLoading = false;
+  protected errorMessage = '';
+
+  constructor(private readonly apollo: Apollo) {}
+
+  ngOnInit(): void {
+    this.loadTables();
+  }
+
+  protected get filteredTables(): Table[] {
+    const search = this.filter.trim().toLowerCase();
+    if (!search) {
+      return this.tables;
+    }
+    return this.tables.filter((table) =>
+      [table.name, table.status].some((value) =>
+        value.toLowerCase().includes(search),
+      ),
+    );
+  }
+
+  protected loadTables(): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.apollo
+      .query({
+        query: TablesDocument,
+      })
+      .pipe(
+        take(1),
+        finalize(() => (this.isLoading = false)),
+      )
+      .subscribe({
+        next: ({ data }) => {
+          this.tables = data!.tables as Table[];
+        },
+        error: () => {
+          this.errorMessage = 'Nao foi possivel carregar as mesas';
+        },
+      });
+  }
+
+  protected deleteTable(id: string): void {
+    this.errorMessage = '';
+
+    this.apollo
+      .mutate({
+        mutation: DeleteTableDocument,
+        variables: { id },
+      })
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this.tables = this.tables.filter((t) => t.id !== id);
+        },
+        error: () => {
+          this.errorMessage = 'Nao foi possivel excluir a mesa';
+        },
+      });
+  }
+}
