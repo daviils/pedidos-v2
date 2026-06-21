@@ -63,7 +63,7 @@
           *ngFor="let session of filteredTableSessions"
           class="table-session-page__row"
         >
-          <td class="fw-semibold">{{ session.table?.name }}</td>
+          <td class="fw-semibold">{{ session.table.name }}</td>
           <td>{{ formatDate(session.openingDate) }}</td>
           <td>{{ session.closingDate ? formatDate(session.closingDate) : '-' }}</td>
           <td>

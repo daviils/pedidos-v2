@@ -77,7 +77,7 @@
               {{ product.description }}
             </span>
           </td>
-          <td>{{ product.category?.title ?? '-' }}</td>
+          <td>{{ product.category.title }}</td>
           <td class="text-end">
             {{ product.price | currency: 'BRL' : 'symbol' : '1.2-2' }}
           </td>
