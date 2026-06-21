@@ -14,7 +14,7 @@ class CreateOrderItemInput {
 @InputType()
 export class CreateOrderInput {
   @Field(() => String)
-  tableId: string;
+  tableSessionId: string;
 
   @Field(() => OrderStatus, { nullable: true })
   status?: OrderStatus;

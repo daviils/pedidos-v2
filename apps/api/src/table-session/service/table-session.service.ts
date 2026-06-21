@@ -27,13 +27,36 @@ export class TableSessionService {
       throw new BadRequestException('Mesa precisa estar aberta para criar uma sessao');
     }
 
-    const session = this.tableSessionRepository.create(data);
+    const openSessions = await this.tableSessionRepository.find({
+      where: { tableId: data.tableId, status: TableSessionStatus.Open },
+    });
 
-    return this.tableSessionRepository.save(session);
+    for (const session of openSessions) {
+      session.status = TableSessionStatus.Closed;
+      session.closingDate = new Date();
+    }
+
+    await this.tableSessionRepository.save(openSessions);
+
+    table.status = TableStatus.Close;
+    await this.tableService.update(data.tableId, { status: TableStatus.Close });
+
+    const newSession = await this.tableSessionRepository.save(
+      this.tableSessionRepository.create(data),
+    );
+
+    return this.findById(newSession.id) as Promise<TableSession>;
   }
 
   findAll(): Promise<TableSession[]> {
     return this.tableSessionRepository.find({ relations: { table: true } });
+  }
+
+  findOpen(): Promise<TableSession[]> {
+    return this.tableSessionRepository.find({
+      where: { status: TableSessionStatus.Open },
+      relations: { table: true },
+    });
   }
 
   findById(id: string): Promise<TableSession | null> {
@@ -60,7 +83,11 @@ export class TableSessionService {
     session.status = TableSessionStatus.Closed;
     session.closingDate = new Date();
 
-    return this.tableSessionRepository.save(session);
+    await this.tableService.update(session.tableId, { status: TableStatus.Open });
+
+    await this.tableSessionRepository.save(session);
+
+    return this.findById(session.id) as Promise<TableSession>;
   }
 
   async update(id: string, data: UpdateTableSessionInput): Promise<TableSession> {
@@ -72,7 +99,9 @@ export class TableSessionService {
 
     Object.assign(session, data);
 
-    return this.tableSessionRepository.save(session);
+    await this.tableSessionRepository.save(session);
+
+    return this.findById(session.id) as Promise<TableSession>;
   }
 
   async delete(id: string): Promise<TableSession> {
@@ -81,6 +110,8 @@ export class TableSessionService {
     if (!session) {
       throw new NotFoundException('Sessao de mesa nao encontrada');
     }
+
+    await this.tableService.update(session.tableId, { status: TableStatus.Open });
 
     await this.tableSessionRepository.remove(session);
 

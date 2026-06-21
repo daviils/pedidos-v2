@@ -28,6 +28,18 @@ query TableSession($id: String!) {
     }
 }
 
+query TableSessionsOpen {
+    tableSessionsOpen {
+        id
+        tableId
+        status
+        table {
+            id
+            name
+        }
+    }
+}
+
 query TableSessionsByTable($tableId: String!) {
     tableSessionsByTable(tableId: $tableId) {
         id

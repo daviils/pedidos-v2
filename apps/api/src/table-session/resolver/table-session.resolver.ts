@@ -26,6 +26,12 @@ export class TableSessionResolver {
   }
 
   @UseGuards(GqlAuthAdminGuard)
+  @Query(() => [TableSession])
+  tableSessionsOpen(): Promise<TableSession[]> {
+    return this.tableSessionService.findOpen();
+  }
+
+  @UseGuards(GqlAuthAdminGuard)
   @Query(() => TableSession, { nullable: true })
   tableSession(
     @Args('id', { type: () => String }) id: string,

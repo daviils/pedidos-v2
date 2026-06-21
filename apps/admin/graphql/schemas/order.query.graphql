@@ -1,12 +1,15 @@
 query Orders {
     orders {
         id
-        tableId
+        tableSessionId
         status
-        table {
+        tableSession {
             id
-            name
-            status
+            table {
+                id
+                name
+                status
+            }
         }
         items {
             id
@@ -27,12 +30,15 @@ query Orders {
 query Order($id: String!) {
     order(id: $id) {
         id
-        tableId
+        tableSessionId
         status
-        table {
+        tableSession {
             id
-            name
-            status
+            table {
+                id
+                name
+                status
+            }
         }
         items {
             id
@@ -53,7 +59,7 @@ query Order($id: String!) {
 mutation CreateOrder($data: CreateOrderInput!) {
     createOrder(data: $data) {
         id
-        tableId
+        tableSessionId
         status
         items {
             id
@@ -67,7 +73,7 @@ mutation CreateOrder($data: CreateOrderInput!) {
 mutation UpdateOrder($id: String!, $data: UpdateOrderInput!) {
     updateOrder(id: $id, data: $data) {
         id
-        tableId
+        tableSessionId
         status
         items {
             id
@@ -81,7 +87,7 @@ mutation UpdateOrder($id: String!, $data: UpdateOrderInput!) {
 mutation DeleteOrder($id: String!) {
     deleteOrder(id: $id) {
         id
-        tableId
+        tableSessionId
         status
     }
 }

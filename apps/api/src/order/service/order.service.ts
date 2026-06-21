@@ -21,7 +21,7 @@ export class OrderService {
 
   async create(data: CreateOrderInput): Promise<Order> {
     const order = this.orderRepository.create({
-      tableId: data.tableId,
+      tableSessionId: data.tableSessionId,
       status: data.status,
     });
     const savedOrder = await this.orderRepository.save(order);
@@ -54,14 +54,14 @@ export class OrderService {
 
   findAll(): Promise<Order[]> {
     return this.orderRepository.find({
-      relations: { table: true, items: { product: true } },
+      relations: { tableSession: { table: true }, items: { product: true } },
     });
   }
 
   findById(id: string): Promise<Order | null> {
     return this.orderRepository.findOne({
       where: { id },
-      relations: { table: true, items: { product: true } },
+      relations: { tableSession: { table: true }, items: { product: true } },
     });
   }
 
@@ -72,8 +72,8 @@ export class OrderService {
       throw new NotFoundException('Pedido nao encontrado');
     }
 
-    if (data.tableId) {
-      order.tableId = data.tableId;
+    if (data.tableSessionId) {
+      order.tableSessionId = data.tableSessionId;
     }
 
     if (data.status) {

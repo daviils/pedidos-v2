@@ -22,22 +22,22 @@
     </div>
 
     <div class="mb-3">
-      <label for="table" class="form-label fw-semibold">Mesa</label>
+      <label for="tableSession" class="form-label fw-semibold">Mesa</label>
       <select
-        id="table"
-        name="table"
+        id="tableSession"
+        name="tableSession"
         class="form-select"
         required
-        [(ngModel)]="order.tableId"
-        #table="ngModel"
+        [(ngModel)]="order.tableSessionId"
+        #tableSession="ngModel"
       >
         <option value="" disabled>Selecione uma mesa</option>
-        <option *ngFor="let table of tables" [value]="table.id">
-          {{ table.name }}
+        <option *ngFor="let session of tableSessions" [value]="session.id">
+          {{ session.table.name }}
         </option>
       </select>
       <div
-        *ngIf="table.invalid && table.touched"
+        *ngIf="tableSession.invalid && tableSession.touched"
         class="form-text text-danger"
       >
         Selecione uma mesa.

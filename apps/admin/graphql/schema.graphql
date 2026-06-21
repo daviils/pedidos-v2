@@ -44,7 +44,7 @@ input CreateMercadoPagoPreferenceInput {
 }
 
 input CreateOrderInput {
-  tableId: String!
+  tableSessionId: String!
   status: OrderStatus
   items: [CreateOrderItemInput!]!
 }
@@ -182,9 +182,9 @@ enum OrderStatus {
 
 type Order {
   id: String!
-  tableId: String!
+  tableSessionId: String!
+  tableSession: TableSession!
   status: OrderStatus!
-  table: Table!
   items: [OrderItem!]!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -232,9 +232,10 @@ type Query {
   product(id: String!): Product
   tables: [Table!]!
   table(id: String!): Table
-  tableSessions: [TableSession!]!
+    tableSessions: [TableSession!]!
   tableSession(id: String!): TableSession
   tableSessionsByTable(tableId: String!): [TableSession!]!
+  tableSessionsOpen: [TableSession!]!
   subscriptions: [Subscription!]!
   subscription(id: String!): Subscription
   userAddresses: [UserAddress!]!
@@ -294,7 +295,7 @@ input UpdateDeliveryFeeInput {
 }
 
 input UpdateOrderInput {
-  tableId: String
+  tableSessionId: String
   status: OrderStatus
   items: [UpdateOrderItemInput!]
 }

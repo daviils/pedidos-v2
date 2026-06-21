@@ -12,7 +12,7 @@ import {
 } from 'typeorm';
 
 import { OrderStatus } from '../enum/order-status.enum';
-import { Table } from '../../table/entity/table.entity';
+import { TableSession } from '../../table-session/entity/table-session.entity';
 import { OrderItem } from './order-item.entity';
 
 @Entity('orders')
@@ -24,7 +24,12 @@ export class Order {
 
   @Field(() => String)
   @Column()
-  tableId: string;
+  tableSessionId: string;
+
+  @Field(() => TableSession)
+  @ManyToOne(() => TableSession)
+  @JoinColumn({ name: 'tableSessionId' })
+  tableSession: TableSession;
 
   @Field(() => OrderStatus)
   @Column({
@@ -33,11 +38,6 @@ export class Order {
     default: OrderStatus.Pending,
   })
   status: OrderStatus;
-
-  @Field(() => Table)
-  @ManyToOne(() => Table)
-  @JoinColumn({ name: 'tableId' })
-  table: Table;
 
   @Field(() => [OrderItem])
   @OneToMany(() => OrderItem, (item) => item.order)

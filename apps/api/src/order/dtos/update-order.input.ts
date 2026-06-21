@@ -15,7 +15,7 @@ class UpdateOrderItemInput {
 @InputType()
 export class UpdateOrderInput {
   @Field(() => String, { nullable: true })
-  tableId?: string;
+  tableSessionId?: string;
 
   @Field(() => OrderStatus, { nullable: true })
   status?: OrderStatus;

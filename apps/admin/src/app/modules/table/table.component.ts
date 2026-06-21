@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { Apollo } from 'apollo-angular';
 import { finalize, take } from 'rxjs';
 
 import {
   TablesDocument,
   DeleteTableDocument,
+  CreateTableSessionDocument,
   type TablesQuery,
 } from '../../graphql/generated/graphql';
 
@@ -22,7 +24,10 @@ export class TableComponent implements OnInit {
   protected isLoading = false;
   protected errorMessage = '';
 
-  constructor(private readonly apollo: Apollo) {}
+  constructor(
+    private readonly apollo: Apollo,
+    private readonly router: Router,
+  ) {}
 
   ngOnInit(): void {
     this.loadTables();
@@ -58,6 +63,27 @@ export class TableComponent implements OnInit {
         },
         error: () => {
           this.errorMessage = 'Nao foi possivel carregar as mesas';
+        },
+      });
+  }
+
+  protected createSession(tableId: string): void {
+    this.errorMessage = '';
+
+    this.apollo
+      .mutate({
+        mutation: CreateTableSessionDocument,
+        variables: {
+          data: { tableId },
+        },
+      })
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          void this.router.navigateByUrl('/table-session');
+        },
+        error: () => {
+          this.errorMessage = 'Nao foi possivel criar a sessao';
         },
       });
   }

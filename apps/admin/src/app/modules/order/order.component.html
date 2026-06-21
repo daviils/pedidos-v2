@@ -64,7 +64,7 @@
           *ngFor="let order of filteredOrders"
           class="order-page__row"
         >
-          <td class="fw-semibold">{{ order.table.name }}</td>
+          <td class="fw-semibold">{{ order.tableSession.table.name }}</td>
           <td>
             <span [class]="getStatusClass(order.status)">
               {{ getStatusLabel(order.status) }}

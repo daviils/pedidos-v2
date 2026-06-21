@@ -23,7 +23,6 @@ export class SidebarComponent {
     { path: '/order', label: 'Pedidos', icon: 'receipt_long' },
     { path: '/product', label: 'Produtos', icon: 'inventory_2' },
     { path: '/category', label: 'Categorias', icon: 'category' },
-    { path: '/subscription', label: 'Assinaturas', icon: 'subscriptions' },
     { path: '/table', label: 'Mesas', icon: 'table_restaurant' },
     { path: '/table-session', label: 'Sessoes', icon: 'meeting_room' },
   ];

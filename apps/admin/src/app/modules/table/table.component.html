@@ -71,6 +71,14 @@
             </span>
           </td>
           <td class="text-end">
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-success me-2"
+              (click)="createSession(table.id)"
+              title="Nova sessao"
+            >
+              <span class="material-icons align-middle fs-6">play_arrow</span>
+            </button>
             <a
               class="btn btn-sm btn-outline-dark me-2"
               [routerLink]="['edit', table.id]"

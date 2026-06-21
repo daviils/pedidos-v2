@@ -36,7 +36,7 @@ export class OrderComponent implements OnInit {
     }
 
     return this.orders.filter((order) =>
-      [order.table.name, order.id].some((value) =>
+      [order.tableSession.table.name, order.id].some((value) =>
         value.toLowerCase().includes(search),
       ),
     );

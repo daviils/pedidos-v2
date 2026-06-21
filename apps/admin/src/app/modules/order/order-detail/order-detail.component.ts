@@ -8,14 +8,14 @@ import {
   CreateOrderDocument,
   type CreateOrderInput,
   OrderDocument,
-  TablesDocument,
+  TableSessionsOpenDocument,
   ProductsDocument,
   UpdateOrderDocument,
-  type TablesQuery,
+  type TableSessionsOpenQuery,
   type ProductsQuery,
 } from '../../../graphql/generated/graphql';
 
-type Table = TablesQuery['tables'][number];
+type TableSession = TableSessionsOpenQuery['tableSessionsOpen'][number];
 type Product = ProductsQuery['products'][number];
 
 interface OrderItemForm {
@@ -35,7 +35,7 @@ export class OrderDetailComponent implements OnInit {
   protected isLoading = false;
   protected isSubmitting = false;
   protected errorMessage = '';
-  protected tables: Table[] = [];
+  protected tableSessions: TableSession[] = [];
   protected products: Product[] = [];
 
   protected readonly statusOptions = [
@@ -55,7 +55,7 @@ export class OrderDetailComponent implements OnInit {
   ngOnInit(): void {
     this.orderId = this.activatedRoute.snapshot.paramMap.get('id') ?? '';
 
-    this.loadTables();
+    this.loadTableSessions();
     this.loadProducts();
 
     if (this.orderId) {
@@ -140,7 +140,7 @@ export class OrderDetailComponent implements OnInit {
           }
 
           this.order = {
-            tableId: data.order.tableId,
+            tableSessionId: data.order.tableSessionId,
             status: data.order.status,
             items: data.order.items.map((item) => ({
               productId: item.productId,
@@ -163,7 +163,7 @@ export class OrderDetailComponent implements OnInit {
         mutation: CreateOrderDocument,
         variables: {
           data: {
-            tableId: this.order.tableId,
+            tableSessionId: this.order.tableSessionId,
             status: this.order.status,
             items: this.order.items.map((item) => ({
               productId: item.productId,
@@ -196,7 +196,7 @@ export class OrderDetailComponent implements OnInit {
         variables: {
           id: this.orderId,
           data: {
-            tableId: this.order.tableId,
+            tableSessionId: this.order.tableSessionId,
             status: this.order.status,
             items: this.order.items.map((item) => ({
               productId: item.productId,
@@ -219,15 +219,15 @@ export class OrderDetailComponent implements OnInit {
       });
   }
 
-  private loadTables(): void {
+  private loadTableSessions(): void {
     this.apollo
       .query({
-        query: TablesDocument,
+        query: TableSessionsOpenDocument,
       })
       .pipe(take(1))
       .subscribe({
         next: ({ data }) => {
-          this.tables = data!.tables;
+          this.tableSessions = data!.tableSessionsOpen;
         },
       });
   }
@@ -247,7 +247,7 @@ export class OrderDetailComponent implements OnInit {
 
   private createEmptyOrder(): CreateOrderInput {
     return {
-      tableId: '',
+      tableSessionId: '',
       status: 'Pending',
       items: [],
     };
