@@ -1,0 +1,102 @@
+<section class="table-session-page">
+  <div class="table-session-page__header">
+    <div>
+      <h1>Sessoes de Mesa</h1>
+      <p>Lista de sessoes abertas e fechadas.</p>
+    </div>
+
+    <div class="table-session-page__actions">
+      <a class="btn btn-dark" routerLink="create">Nova sessao</a>
+
+      <button
+        type="button"
+        class="btn btn-outline-dark"
+        [disabled]="isLoading"
+        (click)="loadTableSessions()"
+      >
+        Atualizar
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger py-2">
+    {{ errorMessage }}
+  </div>
+
+  <div class="table-session-page__filter">
+    <label for="session-filter" class="form-label fw-semibold">Filtro</label>
+    <input
+      id="session-filter"
+      type="search"
+      class="form-control"
+      placeholder="Buscar por mesa ou status"
+      [(ngModel)]="filter"
+    />
+  </div>
+
+  <div class="table-responsive table-session-page__table">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th scope="col">Mesa</th>
+          <th scope="col">Abertura</th>
+          <th scope="col">Fechamento</th>
+          <th scope="col">Status</th>
+          <th scope="col">Valor Total</th>
+          <th scope="col" class="text-end">Acoes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="isLoading">
+          <td colspan="6" class="text-center text-muted py-4">
+            Carregando sessoes...
+          </td>
+        </tr>
+
+        <tr *ngIf="!isLoading && filteredTableSessions.length === 0">
+          <td colspan="6" class="text-center text-muted py-4">
+            Nenhuma sessao encontrada.
+          </td>
+        </tr>
+
+        <tr
+          *ngFor="let session of filteredTableSessions"
+          class="table-session-page__row"
+        >
+          <td class="fw-semibold">{{ session.table?.name }}</td>
+          <td>{{ formatDate(session.openingDate) }}</td>
+          <td>{{ session.closingDate ? formatDate(session.closingDate) : '-' }}</td>
+          <td>
+            <span
+              class="badge"
+              [class.bg-success]="session.status === 'Open'"
+              [class.bg-secondary]="session.status === 'Closed'"
+            >
+              {{ session.status === 'Open' ? 'Aberta' : 'Fechada' }}
+            </span>
+          </td>
+          <td>{{ session.totalValue ? ('R$ ' + session.totalValue) : '-' }}</td>
+          <td class="text-end">
+            <button
+              *ngIf="session.status === 'Open'"
+              type="button"
+              class="btn btn-sm btn-outline-success me-2"
+              (click)="closeTableSession(session.id)"
+              title="Fechar sessao"
+            >
+              <span class="material-icons align-middle fs-6">close</span>
+            </button>
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-danger"
+              (click)="deleteTableSession(session.id)"
+              title="Excluir"
+            >
+              <span class="material-icons align-middle fs-6">delete</span>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

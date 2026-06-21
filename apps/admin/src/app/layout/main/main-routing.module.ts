@@ -51,6 +51,13 @@ const routes: Routes = [
           ),
       },
       {
+        path: 'table-session',
+        loadChildren: () =>
+          import('../../modules/table-session/table-session.module').then(
+            (module) => module.TableSessionModule,
+          ),
+      },
+      {
         path: '',
         pathMatch: 'full',
         redirectTo: 'home',

@@ -19,6 +19,7 @@ import { OrderModule } from './order/order.module';
 import { ProductModule } from './product/product.module';
 import { SubscriptionModule } from './subscription/subscription.module';
 import { TableModule } from './table/table.module';
+import { TableSessionModule } from './table-session/table-session.module';
 import { UploadModule } from './upload/upload.module';
 import { UserAddressModule } from './user-address/user-address.module';
 import { UserAdminAddressModule } from './user-admin-address/user-admin-address.module';
@@ -67,6 +68,7 @@ if (existsSync(envFilePath)) {
     ProductModule,
     SubscriptionModule,
     TableModule,
+    TableSessionModule,
     UploadModule,
     UserAddressModule,
     UserAdminAddressModule,

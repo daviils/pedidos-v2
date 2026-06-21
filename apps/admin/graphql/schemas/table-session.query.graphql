@@ -1,0 +1,100 @@
+query TableSessions {
+    tableSessions {
+        id
+        tableId
+        openingDate
+        closingDate
+        status
+        totalValue
+        table {
+            id
+            name
+        }
+    }
+}
+
+query TableSession($id: String!) {
+    tableSession(id: $id) {
+        id
+        tableId
+        openingDate
+        closingDate
+        status
+        totalValue
+        table {
+            id
+            name
+        }
+    }
+}
+
+query TableSessionsByTable($tableId: String!) {
+    tableSessionsByTable(tableId: $tableId) {
+        id
+        tableId
+        openingDate
+        closingDate
+        status
+        totalValue
+        table {
+            id
+            name
+        }
+    }
+}
+
+mutation CreateTableSession($data: CreateTableSessionInput!) {
+    createTableSession(data: $data) {
+        id
+        tableId
+        openingDate
+        closingDate
+        status
+        totalValue
+        table {
+            id
+            name
+        }
+    }
+}
+
+mutation UpdateTableSession($id: String!, $data: UpdateTableSessionInput!) {
+    updateTableSession(id: $id, data: $data) {
+        id
+        tableId
+        openingDate
+        closingDate
+        status
+        totalValue
+        table {
+            id
+            name
+        }
+    }
+}
+
+mutation CloseTableSession($id: String!) {
+    closeTableSession(id: $id) {
+        id
+        tableId
+        openingDate
+        closingDate
+        status
+        totalValue
+        table {
+            id
+            name
+        }
+    }
+}
+
+mutation DeleteTableSession($id: String!) {
+    deleteTableSession(id: $id) {
+        id
+        tableId
+        openingDate
+        closingDate
+        status
+        totalValue
+    }
+}

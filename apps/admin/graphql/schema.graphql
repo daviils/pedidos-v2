@@ -67,6 +67,10 @@ input CreateTableInput {
   status: TableStatus
 }
 
+input CreateTableSessionInput {
+  tableId: String!
+}
+
 input CreateSubscriptionInput {
   title: String!
   description: String!
@@ -153,6 +157,10 @@ type Mutation {
   createTable(data: CreateTableInput!): Table!
   updateTable(id: String!, data: UpdateTableInput!): Table!
   deleteTable(id: String!): Table!
+  createTableSession(data: CreateTableSessionInput!): TableSession!
+  updateTableSession(id: String!, data: UpdateTableSessionInput!): TableSession!
+  closeTableSession(id: String!): TableSession!
+  deleteTableSession(id: String!): TableSession!
   createSubscription(data: CreateSubscriptionInput!): Subscription!
   updateSubscription(id: String!, data: UpdateSubscriptionInput!): Subscription!
   deleteSubscription(id: String!): Subscription!
@@ -224,6 +232,9 @@ type Query {
   product(id: String!): Product
   tables: [Table!]!
   table(id: String!): Table
+  tableSessions: [TableSession!]!
+  tableSession(id: String!): TableSession
+  tableSessionsByTable(tableId: String!): [TableSession!]!
   subscriptions: [Subscription!]!
   subscription(id: String!): Subscription
   userAddresses: [UserAddress!]!
@@ -244,6 +255,25 @@ type Table {
 enum TableStatus {
   Open
   Close
+}
+
+type TableSession {
+  id: String!
+  tableId: String!
+  table: Table!
+  openingDate: DateTime!
+  closingDate: DateTime
+  status: TableSessionStatus!
+  totalValue: Float
+}
+
+enum TableSessionStatus {
+  Open
+  Closed
+}
+
+input UpdateTableSessionInput {
+  tableId: String
 }
 
 type Subscription {

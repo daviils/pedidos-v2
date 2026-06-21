@@ -32,7 +32,7 @@ export class Table {
   @Column({
     type: 'simple-enum',
     enum: TableStatus,
-    default: TableStatus.Close,
+    default: TableStatus.Open,
   })
   status: TableStatus;
 

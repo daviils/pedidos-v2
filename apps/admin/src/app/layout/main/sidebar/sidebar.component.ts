@@ -25,6 +25,7 @@ export class SidebarComponent {
     { path: '/category', label: 'Categorias', icon: 'category' },
     { path: '/subscription', label: 'Assinaturas', icon: 'subscriptions' },
     { path: '/table', label: 'Mesas', icon: 'table_restaurant' },
+    { path: '/table-session', label: 'Sessoes', icon: 'meeting_room' },
   ];
 
   constructor(private readonly router: Router) {}

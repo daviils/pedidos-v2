@@ -1,0 +1,58 @@
+<section class="table-session-detail-page">
+  <div class="table-session-detail-page__header">
+    <div>
+      <h1>{{ sessionId ? 'Editar sessao' : 'Nova sessao' }}</h1>
+      <p>{{ sessionId ? 'Altere os dados da sessao.' : 'Inicie uma nova sessao em uma mesa.' }}</p>
+    </div>
+
+    <a class="btn btn-outline-dark" routerLink="/table-session">Voltar</a>
+  </div>
+
+  <form
+    class="table-session-detail-page__form"
+    #sessionForm="ngForm"
+    (ngSubmit)="submit(sessionForm)"
+  >
+    <div *ngIf="isLoading" class="alert alert-secondary py-2">
+      Carregando sessao...
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger py-2">
+      {{ errorMessage }}
+    </div>
+
+    <div class="mb-3">
+      <label for="tableId" class="form-label fw-semibold">Mesa</label>
+      <select
+        id="tableId"
+        name="tableId"
+        class="form-select"
+        required
+        [(ngModel)]="session.tableId"
+        #tableId="ngModel"
+      >
+        <option value="" disabled>Selecione uma mesa</option>
+        <option *ngFor="let table of tables" [value]="table.id">
+          {{ table.name }}
+        </option>
+      </select>
+      <div
+        *ngIf="tableId.invalid && tableId.touched"
+        class="form-text text-danger"
+      >
+        Selecione a mesa.
+      </div>
+    </div>
+
+    <div class="table-session-detail-page__actions">
+      <a class="btn btn-outline-secondary" routerLink="/table-session">Cancelar</a>
+      <button
+        type="submit"
+        class="btn btn-dark"
+        [disabled]="isSubmitting"
+      >
+        {{ isSubmitting ? 'Salvando...' : 'Salvar sessao' }}
+      </button>
+    </div>
+  </form>
+</section>
