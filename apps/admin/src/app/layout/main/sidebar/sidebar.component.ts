@@ -20,6 +20,7 @@ export class SidebarComponent {
 
   protected readonly routes: SidebarRoute[] = [
     { path: '/home', label: 'Home', icon: 'home' },
+    { path: '/order', label: 'Pedidos', icon: 'receipt_long' },
     { path: '/product', label: 'Produtos', icon: 'inventory_2' },
     { path: '/category', label: 'Categorias', icon: 'category' },
     { path: '/subscription', label: 'Assinaturas', icon: 'subscriptions' },

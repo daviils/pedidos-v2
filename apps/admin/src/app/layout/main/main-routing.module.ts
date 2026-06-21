@@ -16,6 +16,13 @@ const routes: Routes = [
           ),
       },
       {
+        path: 'order',
+        loadChildren: () =>
+          import('../../modules/order/order.module').then(
+            (module) => module.OrderModule,
+          ),
+      },
+      {
         path: 'product',
         loadChildren: () =>
           import('../../modules/product/product.module').then(

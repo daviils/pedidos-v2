@@ -20,7 +20,10 @@ export class OrderService {
   ) {}
 
   async create(data: CreateOrderInput): Promise<Order> {
-    const order = this.orderRepository.create({ tableId: data.tableId });
+    const order = this.orderRepository.create({
+      tableId: data.tableId,
+      status: data.status,
+    });
     const savedOrder = await this.orderRepository.save(order);
 
     const items: OrderItem[] = [];
@@ -71,6 +74,10 @@ export class OrderService {
 
     if (data.tableId) {
       order.tableId = data.tableId;
+    }
+
+    if (data.status) {
+      order.status = data.status;
     }
 
     if (data.items) {

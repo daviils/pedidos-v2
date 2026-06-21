@@ -11,6 +11,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+import { OrderStatus } from '../enum/order-status.enum';
 import { Table } from '../../table/entity/table.entity';
 import { OrderItem } from './order-item.entity';
 
@@ -24,6 +25,14 @@ export class Order {
   @Field(() => String)
   @Column()
   tableId: string;
+
+  @Field(() => OrderStatus)
+  @Column({
+    type: 'simple-enum',
+    enum: OrderStatus,
+    default: OrderStatus.Pending,
+  })
+  status: OrderStatus;
 
   @Field(() => Table)
   @ManyToOne(() => Table)

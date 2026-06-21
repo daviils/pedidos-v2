@@ -1,0 +1,100 @@
+<section class="order-page">
+  <div class="order-page__header">
+    <div>
+      <h1>Pedidos</h1>
+      <p>Lista de pedidos realizados.</p>
+    </div>
+
+    <div class="order-page__actions">
+      <a class="btn btn-dark" routerLink="create">Criar pedido</a>
+
+      <button
+        type="button"
+        class="btn btn-outline-dark"
+        [disabled]="isLoading"
+        (click)="loadOrders()"
+      >
+        Atualizar
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger py-2">
+    {{ errorMessage }}
+  </div>
+
+  <div class="order-page__filter">
+    <label for="order-filter" class="form-label fw-semibold">Filtro</label>
+    <input
+      id="order-filter"
+      type="search"
+      class="form-control"
+      placeholder="Buscar por id ou mesa"
+      [(ngModel)]="filter"
+    />
+  </div>
+
+  <div class="table-responsive order-page__table">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th scope="col">Mesa</th>
+          <th scope="col">Status</th>
+          <th scope="col">Items</th>
+          <th scope="col" class="text-end">Total</th>
+          <th scope="col">Criado em</th>
+          <th scope="col">Atualizado em</th>
+          <th scope="col" class="text-end">Acoes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="isLoading">
+          <td colspan="6" class="text-center text-muted py-4">
+            Carregando pedidos...
+          </td>
+        </tr>
+
+        <tr *ngIf="!isLoading && filteredOrders.length === 0">
+          <td colspan="6" class="text-center text-muted py-4">
+            Nenhum pedido encontrado.
+          </td>
+        </tr>
+
+        <tr
+          *ngFor="let order of filteredOrders"
+          class="order-page__row"
+        >
+          <td class="fw-semibold">{{ order.table.name }}</td>
+          <td>
+            <span [class]="getStatusClass(order.status)">
+              {{ getStatusLabel(order.status) }}
+            </span>
+          </td>
+          <td>{{ order.items.length }} item(ns)</td>
+          <td class="text-end">
+            {{ getTotal(order.items) | currency: 'BRL' : 'symbol' : '1.2-2' }}
+          </td>
+          <td>{{ formatDate(order.createdAt) }}</td>
+          <td>{{ formatDate(order.updatedAt) }}</td>
+          <td class="text-end">
+            <a
+              class="btn btn-sm btn-outline-dark me-2"
+              [routerLink]="['edit', order.id]"
+              title="Editar"
+            >
+              <span class="material-icons align-middle fs-6">edit</span>
+            </a>
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-danger"
+              (click)="deleteOrder(order.id)"
+              title="Excluir"
+            >
+              <span class="material-icons align-middle fs-6">delete</span>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

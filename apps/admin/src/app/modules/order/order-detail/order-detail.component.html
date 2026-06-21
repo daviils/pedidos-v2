@@ -1,0 +1,159 @@
+<section class="order-detail-page">
+  <div class="order-detail-page__header">
+    <div>
+      <h1>{{ orderId ? 'Editar pedido' : 'Criar pedido' }}</h1>
+      <p>{{ orderId ? 'Altere os dados do pedido.' : 'Cadastre um novo pedido.' }}</p>
+    </div>
+
+    <a class="btn btn-outline-dark" routerLink="/order">Voltar</a>
+  </div>
+
+  <form
+    class="order-detail-page__form"
+    #orderForm="ngForm"
+    (ngSubmit)="submit(orderForm)"
+  >
+    <div *ngIf="isLoading" class="alert alert-secondary py-2">
+      Carregando pedido...
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger py-2">
+      {{ errorMessage }}
+    </div>
+
+    <div class="mb-3">
+      <label for="table" class="form-label fw-semibold">Mesa</label>
+      <select
+        id="table"
+        name="table"
+        class="form-select"
+        required
+        [(ngModel)]="order.tableId"
+        #table="ngModel"
+      >
+        <option value="" disabled>Selecione uma mesa</option>
+        <option *ngFor="let table of tables" [value]="table.id">
+          {{ table.name }}
+        </option>
+      </select>
+      <div
+        *ngIf="table.invalid && table.touched"
+        class="form-text text-danger"
+      >
+        Selecione uma mesa.
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="status" class="form-label fw-semibold">Status</label>
+      <select
+        id="status"
+        name="status"
+        class="form-select"
+        [(ngModel)]="order.status"
+      >
+        <option *ngFor="let opt of statusOptions" [value]="opt.value">
+          {{ opt.label }}
+        </option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <label class="form-label fw-semibold mb-0">Items</label>
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-primary"
+          (click)="addItem()"
+        >
+          <span class="material-icons align-middle fs-6">add</span>
+          Adicionar item
+        </button>
+      </div>
+
+      <div *ngIf="order.items.length === 0" class="text-muted py-2">
+        Nenhum item adicionado.
+      </div>
+
+      <div
+        *ngFor="let item of order.items; let i = index"
+        class="order-detail-page__item"
+      >
+        <div class="row g-2 align-items-end">
+          <div class="col-md-6">
+            <label [for]="'product-' + i" class="form-label">Produto</label>
+            <select
+              [id]="'product-' + i"
+              [name]="'product-' + i"
+              class="form-select form-select-sm"
+              required
+              [(ngModel)]="item.productId"
+              #product="ngModel"
+            >
+              <option value="" disabled>Selecione um produto</option>
+              <option *ngFor="let product of products" [value]="product.id">
+                {{ product.title }} - {{ product.price | currency: 'BRL' : 'symbol' : '1.2-2' }}
+              </option>
+            </select>
+            <div
+              *ngIf="product.invalid && product.touched"
+              class="form-text text-danger"
+            >
+              Selecione um produto.
+            </div>
+          </div>
+          <div class="col-md-3">
+            <label [for]="'quantity-' + i" class="form-label">Qtd</label>
+            <input
+              [id]="'quantity-' + i"
+              [name]="'quantity-' + i"
+              type="number"
+              class="form-control form-control-sm"
+              min="1"
+              required
+              [(ngModel)]="item.quantity"
+              #quantity="ngModel"
+            />
+            <div
+              *ngIf="quantity.invalid && quantity.touched"
+              class="form-text text-danger"
+            >
+              Informe a quantidade.
+            </div>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Subtotal</label>
+            <p class="form-control-plaintext mb-0">
+              {{ getItemTotal(item.quantity, item.productId) | currency: 'BRL' : 'symbol' : '1.2-2' }}
+            </p>
+          </div>
+          <div class="col-md-1">
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-danger"
+              (click)="removeItem(i)"
+              title="Remover item"
+            >
+              <span class="material-icons align-middle fs-6">close</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="order-detail-page__total" *ngIf="order.items.length > 0">
+      <strong>Total: {{ orderTotal | currency: 'BRL' : 'symbol' : '1.2-2' }}</strong>
+    </div>
+
+    <div class="order-detail-page__actions">
+      <a class="btn btn-outline-secondary" routerLink="/order">Cancelar</a>
+      <button
+        type="submit"
+        class="btn btn-dark"
+        [disabled]="isSubmitting"
+      >
+        {{ isSubmitting ? 'Salvando...' : 'Salvar pedido' }}
+      </button>
+    </div>
+  </form>
+</section>

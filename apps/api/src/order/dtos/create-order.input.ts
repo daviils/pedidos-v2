@@ -1,5 +1,7 @@
 import { Field, InputType, Int } from '@nestjs/graphql';
 
+import { OrderStatus } from '../enum/order-status.enum';
+
 @InputType()
 class CreateOrderItemInput {
   @Field(() => String)
@@ -13,6 +15,9 @@ class CreateOrderItemInput {
 export class CreateOrderInput {
   @Field(() => String)
   tableId: string;
+
+  @Field(() => OrderStatus, { nullable: true })
+  status?: OrderStatus;
 
   @Field(() => [CreateOrderItemInput])
   items: CreateOrderItemInput[];
