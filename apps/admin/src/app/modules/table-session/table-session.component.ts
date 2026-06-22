@@ -3,15 +3,15 @@ import { Apollo } from 'apollo-angular';
 import { take } from 'rxjs';
 
 import {
-  TableSessionsDocument,
+  TableSessionsOpenDocument,
   DeleteTableSessionDocument,
   CloseTableSessionDocument,
   TablesDocument,
-  type TableSessionsQuery,
+  type TableSessionsOpenQuery,
   type TablesQuery,
 } from '../../graphql/generated/graphql';
 
-type TableSession = TableSessionsQuery['tableSessions'][number];
+type TableSession = TableSessionsOpenQuery['tableSessionsOpen'][number];
 type Table = TablesQuery['tables'][number];
 
 @Component({
@@ -62,9 +62,9 @@ export class TableSessionComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.apollo.query<any>({ query: TableSessionsDocument }).pipe(take(1)).subscribe({
+    this.apollo.query<any>({ query: TableSessionsOpenDocument }).pipe(take(1)).subscribe({
       next: ({ data }) => {
-        this.tableSessions = data.tableSessions;
+        this.tableSessions = data.tableSessionsOpen;
         this.isLoading = false;
       },
       error: () => {

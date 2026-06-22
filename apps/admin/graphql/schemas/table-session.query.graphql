@@ -32,7 +32,10 @@ query TableSessionsOpen {
     tableSessionsOpen {
         id
         tableId
+        openingDate
+        closingDate
         status
+        totalValue
         table {
             id
             name
