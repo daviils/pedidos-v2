@@ -1,4 +1,24 @@
 <section class="home-page">
-  <h1>Home</h1>
-  <p>Pagina inicial do modulo home.</p>
+  <h1>Cardápio</h1>
+
+  @for (category of categories; track category.id) {
+    <article class="category">
+      <h2>{{ category.title }}</h2>
+
+      <div class="products">
+        @for (product of category.products; track product.id) {
+          <div class="product-card">
+            @if (product.photoUrl) {
+              <img [src]="getProductImageUrl(product.photoUrl)" [alt]="product.title" class="product-photo" />
+            }
+            <div class="product-info">
+              <h3>{{ product.title }}</h3>
+              <p>{{ product.description }}</p>
+              <span class="product-price">{{ product.price | currency: 'BRL' }}</span>
+            </div>
+          </div>
+        }
+      </div>
+    </article>
+  }
 </section>

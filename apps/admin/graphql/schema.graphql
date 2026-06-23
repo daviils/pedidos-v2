@@ -1,4 +1,3 @@
-
 """Exposes a URL that specifies the behavior of this scalar."""
 directive @specifiedBy(
   """The URL that specifies the behavior of this scalar."""
@@ -62,6 +61,12 @@ input CreateProductInput {
   categoryId: String
 }
 
+input CreateSubscriptionInput {
+  title: String!
+  description: String!
+  price: Float!
+}
+
 input CreateTableInput {
   name: String!
   status: TableStatus
@@ -69,12 +74,6 @@ input CreateTableInput {
 
 input CreateTableSessionInput {
   tableId: String!
-}
-
-input CreateSubscriptionInput {
-  title: String!
-  description: String!
-  price: Float!
 }
 
 input CreateUserAddressInput {
@@ -154,30 +153,22 @@ type Mutation {
   createProduct(data: CreateProductInput!): Product!
   updateProduct(id: String!, data: UpdateProductInput!): Product!
   deleteProduct(id: String!): Product!
+  createSubscription(data: CreateSubscriptionInput!): Subscription!
+  updateSubscription(id: String!, data: UpdateSubscriptionInput!): Subscription!
+  deleteSubscription(id: String!): Subscription!
   createTable(data: CreateTableInput!): Table!
   updateTable(id: String!, data: UpdateTableInput!): Table!
   deleteTable(id: String!): Table!
   createTableSession(data: CreateTableSessionInput!): TableSession!
-  updateTableSession(id: String!, data: UpdateTableSessionInput!): TableSession!
   closeTableSession(id: String!): TableSession!
+  updateTableSession(id: String!, data: UpdateTableSessionInput!): TableSession!
   deleteTableSession(id: String!): TableSession!
-  createSubscription(data: CreateSubscriptionInput!): Subscription!
-  updateSubscription(id: String!, data: UpdateSubscriptionInput!): Subscription!
-  deleteSubscription(id: String!): Subscription!
   createUserAddress(data: CreateUserAddressInput!): UserAddress!
   updateUserAddress(id: String!, data: UpdateUserAddressInput!): UserAddress!
   deleteUserAddress(id: String!): UserAddress!
   createUserAdminAddress(data: CreateUserAdminAddressInput!): UserAdminAddress!
   updateUserAdminAddress(id: String!, data: UpdateUserAdminAddressInput!): UserAdminAddress!
   deleteUserAdminAddress(id: String!): UserAdminAddress!
-}
-
-enum OrderStatus {
-  Pending
-  Confirmed
-  Preparing
-  Done
-  Cancelled
 }
 
 type Order {
@@ -201,6 +192,14 @@ type OrderItem {
   unitPrice: Float!
   createdAt: DateTime!
   updatedAt: DateTime!
+}
+
+enum OrderStatus {
+  Pending
+  Confirmed
+  Preparing
+  Done
+  Cancelled
 }
 
 type Product {
@@ -227,21 +226,29 @@ type Query {
   deliveryFee(id: String!): DeliveryFee
   pendingMercadoPagoPreference: MercadoPagoPreference!
   orders: [Order!]!
+  ordersByTableSession(tableSessionId: String!): [Order!]!
   order(id: String!): Order
   products: [Product!]!
   product(id: String!): Product
-  tables: [Table!]!
-  table(id: String!): Table
-    tableSessions: [TableSession!]!
-  tableSession(id: String!): TableSession
-  tableSessionsByTable(tableId: String!): [TableSession!]!
-  tableSessionsOpen: [TableSession!]!
   subscriptions: [Subscription!]!
   subscription(id: String!): Subscription
+  tables: [Table!]!
+  table(id: String!): Table
+  tableSessions: [TableSession!]!
+  tableSessionsOpen: [TableSession!]!
+  tableSession(id: String!): TableSession
+  tableSessionsByTable(tableId: String!): [TableSession!]!
   userAddresses: [UserAddress!]!
   userAddress(id: String!): UserAddress
   userAdminAddresses: [UserAdminAddress!]!
   userAdminAddress(id: String!): UserAdminAddress
+}
+
+type Subscription {
+  id: String!
+  title: String!
+  description: String!
+  price: Float!
 }
 
 type Table {
@@ -251,11 +258,6 @@ type Table {
   createdAt: DateTime!
   updatedAt: DateTime!
   deletedAt: DateTime
-}
-
-enum TableStatus {
-  Open
-  Close
 }
 
 type TableSession {
@@ -273,15 +275,9 @@ enum TableSessionStatus {
   Closed
 }
 
-input UpdateTableSessionInput {
-  tableId: String
-}
-
-type Subscription {
-  id: String!
-  title: String!
-  description: String!
-  price: Float!
+enum TableStatus {
+  Open
+  Close
 }
 
 input UpdateCategoryInput {
@@ -322,6 +318,10 @@ input UpdateSubscriptionInput {
 input UpdateTableInput {
   name: String
   status: TableStatus
+}
+
+input UpdateTableSessionInput {
+  tableId: String
 }
 
 input UpdateUserAddressInput {
