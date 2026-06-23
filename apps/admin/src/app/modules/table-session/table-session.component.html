@@ -77,21 +77,12 @@
           <td>{{ session.totalValue ? ('R$ ' + session.totalValue) : '-' }}</td>
           <td class="text-end">
             <button
-              *ngIf="session.status === 'Open'"
               type="button"
-              class="btn btn-sm btn-outline-success me-2"
-              (click)="closeTableSession(session.id)"
-              title="Fechar sessao"
+              class="btn btn-sm btn-outline-primary"
+              (click)="goToDetail(session.id)"
+              title="Detalhes"
             >
-              <span class="material-icons align-middle fs-6">close</span>
-            </button>
-            <button
-              type="button"
-              class="btn btn-sm btn-outline-danger"
-              (click)="deleteTableSession(session.id)"
-              title="Excluir"
-            >
-              <span class="material-icons align-middle fs-6">delete</span>
+              <span class="material-icons align-middle fs-6">visibility</span>
             </button>
           </td>
         </tr>

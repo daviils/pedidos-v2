@@ -48,6 +48,7 @@
   min-width: 720px;
 }
 
+
 @media (max-width: 640px) {
   .order-page {
     padding: 20px;

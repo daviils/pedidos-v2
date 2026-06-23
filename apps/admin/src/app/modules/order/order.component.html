@@ -40,46 +40,46 @@
         <tr>
           <th scope="col">Mesa</th>
           <th scope="col">Status</th>
-          <th scope="col">Items</th>
-          <th scope="col" class="text-end">Total</th>
+          <th scope="col">Produto</th>
+          <th scope="col" class="text-end">Qtd</th>
+          <th scope="col" class="text-end">Preco unit.</th>
+          <th scope="col" class="text-end">Subtotal</th>
           <th scope="col">Criado em</th>
-          <th scope="col">Atualizado em</th>
           <th scope="col" class="text-end">Acoes</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngIf="isLoading">
-          <td colspan="6" class="text-center text-muted py-4">
+          <td colspan="8" class="text-center text-muted py-4">
             Carregando pedidos...
           </td>
         </tr>
 
-        <tr *ngIf="!isLoading && filteredOrders.length === 0">
-          <td colspan="6" class="text-center text-muted py-4">
+        <tr *ngIf="!isLoading && filteredItems.length === 0">
+          <td colspan="8" class="text-center text-muted py-4">
             Nenhum pedido encontrado.
           </td>
         </tr>
 
         <tr
-          *ngFor="let order of filteredOrders"
+          *ngFor="let item of filteredItems"
           class="order-page__row"
         >
-          <td class="fw-semibold">{{ order.tableSession.table.name }}</td>
+          <td class="fw-semibold">{{ item.tableName }}</td>
           <td>
-            <span [class]="getStatusClass(order.status)">
-              {{ getStatusLabel(order.status) }}
+            <span [class]="getStatusClass(item.orderStatus)">
+              {{ getStatusLabel(item.orderStatus) }}
             </span>
           </td>
-          <td>{{ order.items.length }} item(ns)</td>
-          <td class="text-end">
-            {{ getTotal(order.items) | currency: 'BRL' : 'symbol' : '1.2-2' }}
-          </td>
-          <td>{{ formatDate(order.createdAt) }}</td>
-          <td>{{ formatDate(order.updatedAt) }}</td>
+          <td>{{ item.productTitle }}</td>
+          <td class="text-end">{{ item.quantity }}</td>
+          <td class="text-end">{{ item.unitPrice | currency: 'BRL' : 'symbol' : '1.2-2' }}</td>
+          <td class="text-end">{{ item.quantity * item.unitPrice | currency: 'BRL' : 'symbol' : '1.2-2' }}</td>
+          <td>{{ formatDate(item.createdAt) }}</td>
           <td class="text-end">
             <a
               class="btn btn-sm btn-outline-dark me-2"
-              [routerLink]="['edit', order.id]"
+              [routerLink]="['edit', item.orderId]"
               title="Editar"
             >
               <span class="material-icons align-middle fs-6">edit</span>
@@ -87,7 +87,7 @@
             <button
               type="button"
               class="btn btn-sm btn-outline-danger"
-              (click)="deleteOrder(order.id)"
+              (click)="deleteOrder(item.orderId)"
               title="Excluir"
             >
               <span class="material-icons align-middle fs-6">delete</span>

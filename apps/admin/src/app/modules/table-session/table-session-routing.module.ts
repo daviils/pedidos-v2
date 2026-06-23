@@ -14,6 +14,10 @@ const routes: Routes = [
     component: TableSessionDetailComponent,
   },
   {
+    path: ':id',
+    component: TableSessionDetailComponent,
+  },
+  {
     path: 'edit/:id',
     component: TableSessionDetailComponent,
   },

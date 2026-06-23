@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { take } from 'rxjs';
+import { Router } from '@angular/router';
 
 import {
   TableSessionsOpenDocument,
@@ -27,7 +28,10 @@ export class TableSessionComponent implements OnInit {
   protected isLoading = false;
   protected errorMessage = '';
 
-  constructor(private readonly apollo: Apollo) {}
+  constructor(
+    private readonly apollo: Apollo,
+    private readonly router: Router,
+  ) {}
 
   ngOnInit(): void {
     this.loadTables();
@@ -93,6 +97,10 @@ export class TableSessionComponent implements OnInit {
           this.errorMessage = 'Nao foi possivel fechar a sessao';
         },
       });
+  }
+
+  protected goToDetail(id: string): void {
+    void this.router.navigateByUrl(`/table-session/${id}`);
   }
 
   protected formatDate(date: unknown): string {

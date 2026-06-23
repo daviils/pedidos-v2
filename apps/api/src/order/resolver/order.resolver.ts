@@ -24,6 +24,14 @@ export class OrderResolver {
   }
 
   @UseGuards(GqlAuthAdminGuard)
+  @Query(() => [Order])
+  ordersByTableSession(
+    @Args('tableSessionId', { type: () => String }) tableSessionId: string,
+  ): Promise<Order[]> {
+    return this.orderService.findByTableSession(tableSessionId);
+  }
+
+  @UseGuards(GqlAuthAdminGuard)
   @Query(() => Order, { nullable: true })
   order(
     @Args('id', { type: () => String }) id: string,

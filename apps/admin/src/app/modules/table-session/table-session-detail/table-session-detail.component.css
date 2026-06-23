@@ -31,6 +31,42 @@
   flex-wrap: wrap;
   gap: 8px;
   justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.table-session-detail-page__orders {
+  margin-top: 32px;
+}
+
+.table-session-detail-page__orders-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.table-session-detail-page__orders-header h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.table-session-detail-page__orders-table {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.table-session-detail-page__orders-table table {
+  min-width: 500px;
+}
+
+.table-session-detail-page__orders-total {
+  padding: 16px 20px;
+  text-align: right;
+  border-top: 1px solid #e5e7eb;
+  font-size: 18px;
 }
 
 @media (max-width: 640px) {

@@ -27,6 +27,35 @@ query Orders {
     }
 }
 
+query OrdersByTableSession($tableSessionId: String!) {
+    ordersByTableSession(tableSessionId: $tableSessionId) {
+        id
+        tableSessionId
+        status
+        tableSession {
+            id
+            table {
+                id
+                name
+                status
+            }
+        }
+        items {
+            id
+            productId
+            product {
+                id
+                title
+                price
+            }
+            quantity
+            unitPrice
+        }
+        createdAt
+        updatedAt
+    }
+}
+
 query Order($id: String!) {
     order(id: $id) {
         id

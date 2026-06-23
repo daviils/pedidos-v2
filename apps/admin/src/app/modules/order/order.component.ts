@@ -10,6 +10,16 @@ import {
 
 type Order = OrdersQuery['orders'][number];
 
+interface OrderItemRow {
+  orderId: string;
+  orderStatus: string;
+  tableName: string;
+  createdAt: unknown;
+  productTitle: string;
+  quantity: number;
+  unitPrice: number;
+}
+
 @Component({
   selector: 'app-order',
   standalone: false,
@@ -28,15 +38,31 @@ export class OrderComponent implements OnInit {
     this.loadOrders();
   }
 
-  protected get filteredOrders(): Order[] {
+  protected get filteredItems(): OrderItemRow[] {
     const search = this.filter.trim().toLowerCase();
 
-    if (!search) {
-      return this.orders;
+    const rows: OrderItemRow[] = [];
+
+    for (const order of this.orders) {
+      for (const item of order.items) {
+        rows.push({
+          orderId: order.id,
+          orderStatus: order.status,
+          tableName: order.tableSession.table.name,
+          createdAt: order.createdAt,
+          productTitle: item.product.title,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+        });
+      }
     }
 
-    return this.orders.filter((order) =>
-      [order.tableSession.table.name, order.id].some((value) =>
+    if (!search) {
+      return rows;
+    }
+
+    return rows.filter((row) =>
+      [row.tableName, row.orderId, row.productTitle].some((value) =>
         value.toLowerCase().includes(search),
       ),
     );
@@ -96,18 +122,16 @@ export class OrderComponent implements OnInit {
 
   protected getStatusClass(status: string): string {
     const classes: Record<string, string> = {
-      Pending: 'text-warning',
-      Confirmed: 'text-info',
-      Preparing: 'text-primary',
-      Done: 'text-success',
-      Cancelled: 'text-danger',
+      Pending: 'badge bg-warning text-dark',
+      Confirmed: 'badge bg-info text-dark',
+      Preparing: 'badge bg-primary text-white',
+      Done: 'badge bg-success text-white',
+      Cancelled: 'badge bg-danger text-white',
     };
-    return classes[status] ?? '';
+    return classes[status] ?? 'badge bg-secondary text-white';
   }
 
-  protected getTotal(items: Order['items']): number {
-    return items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
-  }
+
 
   protected formatDate(value: unknown): string {
     if (!value) {

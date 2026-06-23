@@ -58,6 +58,13 @@ export class OrderService {
     });
   }
 
+  findByTableSession(tableSessionId: string): Promise<Order[]> {
+    return this.orderRepository.find({
+      where: { tableSessionId },
+      relations: { tableSession: { table: true }, items: { product: true } },
+    });
+  }
+
   findById(id: string): Promise<Order | null> {
     return this.orderRepository.findOne({
       where: { id },

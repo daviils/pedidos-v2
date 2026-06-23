@@ -2,17 +2,15 @@
   <div class="table-session-detail-page__header">
     <div>
       <h1>{{ sessionId ? 'Editar sessao' : 'Nova sessao' }}</h1>
-      <p>{{ sessionId ? 'Altere os dados da sessao.' : 'Inicie uma nova sessao em uma mesa.' }}</p>
+      <p *ngIf="openingDate" class="table-session-detail-page__date">
+        Aberta em {{ formatDate(openingDate) }}
+      </p>
     </div>
 
     <a class="btn btn-outline-dark" routerLink="/table-session">Voltar</a>
   </div>
 
-  <form
-    class="table-session-detail-page__form"
-    #sessionForm="ngForm"
-    (ngSubmit)="submit(sessionForm)"
-  >
+  <div class="table-session-detail-page__form">
     <div *ngIf="isLoading" class="alert alert-secondary py-2">
       Carregando sessao...
     </div>
@@ -21,38 +19,94 @@
       {{ errorMessage }}
     </div>
 
-    <div class="mb-3">
-      <label for="tableId" class="form-label fw-semibold">Mesa</label>
-      <select
-        id="tableId"
-        name="tableId"
-        class="form-select"
-        required
-        [(ngModel)]="session.tableId"
-        #tableId="ngModel"
-      >
-        <option value="" disabled>Selecione uma mesa</option>
-        <option *ngFor="let table of tables" [value]="table.id">
-          {{ table.name }}
-        </option>
-      </select>
-      <div
-        *ngIf="tableId.invalid && tableId.touched"
-        class="form-text text-danger"
-      >
-        Selecione a mesa.
-      </div>
+
+  </div>
+
+  <div *ngIf="sessionId" class="table-session-detail-page__orders">
+    <div class="table-session-detail-page__orders-header">
+      <h2>Historico de pedidos</h2>
+      <a class="btn btn-sm btn-outline-primary" [routerLink]="['/order/create']">
+        <span class="material-icons align-middle fs-6">add</span>
+        Novo pedido
+      </a>
     </div>
 
-    <div class="table-session-detail-page__actions">
-      <a class="btn btn-outline-secondary" routerLink="/table-session">Cancelar</a>
-      <button
-        type="submit"
-        class="btn btn-dark"
-        [disabled]="isSubmitting"
-      >
-        {{ isSubmitting ? 'Salvando...' : 'Salvar sessao' }}
-      </button>
+    <div class="table-responsive table-session-detail-page__orders-table">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th scope="col">Status</th>
+            <th scope="col">Produto</th>
+            <th scope="col" class="text-end">Qtd</th>
+            <th scope="col" class="text-end">Preco unit.</th>
+            <th scope="col" class="text-end">Subtotal</th>
+            <th scope="col">Criado em</th>
+            <th scope="col" class="text-end">Acoes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="ordersLoading">
+            <td colspan="7" class="text-center text-muted py-4">
+              Carregando pedidos...
+            </td>
+          </tr>
+
+          <tr *ngIf="!ordersLoading && orders.length === 0">
+            <td colspan="7" class="text-center text-muted py-4">
+              Nenhum pedido nesta sessao.
+            </td>
+          </tr>
+
+          <tr *ngFor="let item of orderItems">
+            <td>
+              <span [class]="getStatusClass(item.orderStatus)">
+                {{ getStatusLabel(item.orderStatus) }}
+              </span>
+            </td>
+            <td>{{ item.productTitle }}</td>
+            <td class="text-end">{{ item.quantity }}</td>
+            <td class="text-end">{{ item.unitPrice | currency: 'BRL' : 'symbol' : '1.2-2' }}</td>
+            <td class="text-end">{{ item.quantity * item.unitPrice | currency: 'BRL' : 'symbol' : '1.2-2' }}</td>
+            <td>{{ formatDate(item.createdAt) }}</td>
+            <td class="text-end">
+              <a
+                class="btn btn-sm btn-outline-dark"
+                [routerLink]="['/order/edit', item.orderId]"
+                title="Editar"
+              >
+                <span class="material-icons align-middle fs-6">edit</span>
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div *ngIf="orderItems.length > 0" class="table-session-detail-page__orders-total">
+        <strong>Total geral: {{ ordersTotal | currency: 'BRL' : 'symbol' : '1.2-2' }}</strong>
+      </div>
     </div>
-  </form>
+  </div>
+
+  <div class="table-session-detail-page__actions">
+    <a class="btn btn-outline-secondary" routerLink="/table-session">Cancelar</a>
+
+    <button
+      *ngIf="sessionId"
+      type="button"
+      class="btn btn-outline-primary"
+      (click)="downloadPdf()"
+    >
+      <span class="material-icons align-middle fs-6">file_download</span>
+      Baixar PDF
+    </button>
+
+    <button
+      *ngIf="sessionId && sessionStatus === 'Open'"
+      type="button"
+      class="btn btn-outline-success"
+      [disabled]="isClosing"
+      (click)="closeSession()"
+    >
+      {{ isClosing ? 'Fechando...' : 'Fechar sessao' }}
+    </button>
+  </div>
 </section>
