@@ -9,16 +9,9 @@ const routes: Routes = [
     component: MainComponent,
     children: [
       {
-        path: 'home',
-        loadChildren: () =>
-          import('../../modules/home/home.module').then(
-            (module) => module.HomeModule,
-          ),
-      },
-      {
         path: '',
         pathMatch: 'full',
-        redirectTo: 'home',
+        redirectTo: '/home',
       },
     ],
   },

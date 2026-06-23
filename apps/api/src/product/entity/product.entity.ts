@@ -36,9 +36,9 @@ export class Product {
   @Column({ nullable: true })
   categoryId: string | null;
 
-  @Field(() => Category)
+  @Field(() => Category, { nullable: true })
   @ManyToOne(() => Category, (category) => category.products)
   @JoinColumn({ name: 'categoryId' })
-  category: Category;
+  category: Category | null;
 
 }

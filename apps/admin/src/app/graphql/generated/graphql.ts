@@ -185,7 +185,7 @@ export type DeleteOrderMutation = { deleteOrder: { id: string, tableSessionId: s
 export type ProductsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ProductsQuery = { products: Array<{ id: string, title: string, description: string, photoUrl: string | null, price: number, categoryId: string | null, category: { title: string } }> };
+export type ProductsQuery = { products: Array<{ id: string, title: string, description: string, photoUrl: string | null, price: number, categoryId: string | null, category: { title: string } | null }> };
 
 export type ProductQueryVariables = Exact<{
   id: string;
