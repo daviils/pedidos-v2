@@ -1,32 +1,70 @@
-# 1. Build
-- name: Build API
-  run: npm run build:api
+name: Deploy to Azure App Service
 
-# 2. Criar pacote limpo só da API
-- name: Prepare deployment folder
-  run: |
-    rm -rf deploy
-    mkdir deploy
+on:
+  push:
+    branches:
+      - develop
 
-    cp -r apps/api/dist deploy/dist
-    cp apps/api/package.json deploy/
-    cp apps/api/package-lock.json deploy/
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
 
-# 3. Instalar dependências de produção no pacote
-- name: Install production deps
-  run: |
-    cd deploy
-    npm ci --omit=dev
+    steps:
+      # 1. Pega o código
+      - name: Checkout repository
+        uses: actions/checkout@v6
 
-# 4. Zip SOMENTE da API
-- name: Zip package
-  run: |
-    cd deploy
-    zip -r ../release.zip .
+      # 2. Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
 
-# 5. Deploy
-- name: Deploy to Azure
-  uses: azure/webapps-deploy@v3
-  with:
-    app-name: ${{ secrets.AZURE_APP_NAME }}
-    package: release.zip
+      # 3. Instalar dependências
+      - name: Install dependencies
+        run: npm ci
+
+      # 4. Build (NestJS/TS/etc)
+      - name: Build project
+        run: npm run build:api
+
+      # 5. Criar pacote limpo só da API
+      - name: Prepare deployment folder
+        run: |
+          rm -rf deploy
+          mkdir deploy
+
+          cp -r apps/api/dist deploy/dist
+          cp apps/api/package.json deploy/
+          cp apps/api/package-lock.json deploy/
+
+      # 6. Instalar dependências de produção no pacote
+      - name: Install production deps
+        run: |
+          cd deploy
+          npm ci --omit=dev
+
+      # 7. Login no Azure
+      - name: Azure Login
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Zip package
+        run: |
+          cd deploy
+          zip -r ../release.zip .
+
+      # 8. Deploy no App Service
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ secrets.AZURE_APP_NAME }}
+          package: release.zip
+ 
