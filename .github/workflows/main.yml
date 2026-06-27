@@ -48,6 +48,11 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+      - name: Create deployment package
+        run: |
+          cd apps/api
+          zip -r ../../release.zip . -x "node_modules/*"
+
       # 8. Deploy no App Service
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
