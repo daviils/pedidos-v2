@@ -6,6 +6,7 @@
     "apps/*"
   ],
   "scripts": {
+    "build:api": "npm run build --workspace @pedidos/api",
     "api:start": "npm run start --workspace @pedidos/api",
     "api:start:dev": "npm run start:dev --workspace @pedidos/api",
     "api:build": "npm run build --workspace @pedidos/api",
