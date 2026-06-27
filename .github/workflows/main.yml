@@ -51,3 +51,4 @@ jobs:
         with:
           app-name: ${{ secrets.AZURE_APP_NAME }}
           package: release.zip
+ 
