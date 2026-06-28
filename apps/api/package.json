@@ -28,6 +28,11 @@
     "swagger-ui-express": "^5.0.1",
     "typeorm": "^1.0.0"
   },
+  "overrides": {
+    "@apollo/server-plugin-landing-page-graphql-playground": {
+      "@apollo/server": "$@apollo/server"
+    }
+  },
   "devDependencies": {
     "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.0.0",
