@@ -3,6 +3,8 @@ name: Deploy API
 on:
   push:
     branches: [develop]
+    paths:
+      - "apps/api/**"
 
 jobs:
   deploy:
@@ -21,9 +23,11 @@ jobs:
           node-version: 22
 
       - name: Install dependencies
+        working-directory: apps/api
         run: npm ci 
 
       - name: Build API
+        working-directory: apps/api
         run: npm run build
 
       - name: Azure Login (OIDC)
@@ -37,3 +41,4 @@ jobs:
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ secrets.AZURE_APP_NAME }}
+          package: apps/api
