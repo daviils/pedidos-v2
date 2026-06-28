@@ -56,7 +56,7 @@ if (existsSync(envFilePath)) {
       autoSchemaFile: true,
       context: ({ req }) => ({ req }),
       playground: false,
-      // plugins: [ApolloServerPluginLandingPageLocalDefault()],
+      plugins: [ApolloServerPluginLandingPageLocalDefault()],
     }),
     AuthAdminModule,
     AuthModule,
