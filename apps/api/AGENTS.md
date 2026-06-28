@@ -16,4 +16,4 @@ Padrão de arquitetura da API:
   - `service`: services no padrão `<dominio>.service.ts`.
 - O `module` do domínio deve registrar seus `providers`, como resolver e service.
 - O módulo principal da aplicação deve importar os módulos de domínio.
-- A API deve priorizar GraphQL com resolver em vez de controller REST, salvo pedido explícito em contrário. 
+- A API deve priorizar GraphQL com resolver em vez de controller REST, salvo pedido explícito em contrário.  
