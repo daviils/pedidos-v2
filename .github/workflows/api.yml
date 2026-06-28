@@ -27,26 +27,29 @@ jobs:
           cache: npm
           cache-dependency-path: package-lock.json
 
-      # 3. Install dependencies
+      # 3. Install
       - name: Install dependencies
         working-directory: apps/api
         run: npm ci
 
-      # 4. Build API
+      # 4. Build
       - name: Build API
-        run: npm run build:api
+        working-directory: apps/api
+        run: npm run build
 
-      # 5. Azure Login
-      - name: Azure Login
-        uses: azure/login@v3
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      # 5. Deploy ONLY dist + package.json
+      - name: Prepare deploy folder
+        run: |
+          cd apps/api
+          rm -rf node_modules
+          mkdir -p deploy
+          cp -r dist deploy/
+          cp package.json deploy/
+          cp package-lock.json deploy/
 
-      # 6. Deploy only API folder
+      # 6. Deploy
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ secrets.AZURE_APP_NAME }}
-          package: apps/api
+          package: apps/api/deploy
