@@ -7,7 +7,7 @@
     "moduleResolution": "node",
     "noFallthroughCasesInSwitch": false,
     "noImplicitAny": false,
-    "outDir": "../../dist/apps/api",
+    "outDir": "dist",
     "removeComments": true,
     "skipLibCheck": true,
     "sourceMap": true,
