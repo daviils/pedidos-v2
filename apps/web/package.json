@@ -3,10 +3,10 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "cd ../.. && ng serve web",
-    "build": "cd ../.. && ng build web",
-    "codegen": "cd ../.. && graphql-codegen --config apps/web/codegen.yml",
-    "codegen:watch": "cd ../.. && graphql-codegen --config apps/web/codegen.yml --watch"
+    "start": "ng serve",
+    "build": "ng build",
+    "codegen": "graphql-codegen --config codegen.yml",
+    "codegen:watch": "graphql-codegen --config codegen.yml --watch"
   },
   "dependencies": {
     "@angular/animations": "^20.0.0",

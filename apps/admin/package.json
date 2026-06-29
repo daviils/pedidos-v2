@@ -1,12 +1,11 @@
 {
-  "name": "@pedidos/admin",
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "cd ../.. && ng serve admin",
-    "build": "cd ../.. && ng build admin",
-    "codegen": "cd ../.. && graphql-codegen --config apps/admin/codegen.yml",
-    "codegen:watch": "cd ../.. && graphql-codegen --config apps/admin/codegen.yml --watch"
+    "start": "ng serve",
+    "build": "ng build",
+    "codegen": "graphql-codegen --config codegen.yml",
+    "codegen:watch": "graphql-codegen --config codegen.yml --watch"
   },
   "dependencies": {
     "@angular/animations": "^20.0.0",
