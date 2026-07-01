@@ -34,6 +34,8 @@ if (existsSync(envFilePath)) {
   loadEnvFile(envFilePath);
 }
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -56,7 +58,8 @@ if (existsSync(envFilePath)) {
       autoSchemaFile: true,
       context: ({ req }) => ({ req }),
       playground: false,
-      plugins: [ApolloServerPluginLandingPageLocalDefault()],
+      introspection: !isProduction,
+      plugins: isProduction ? [] : [ApolloServerPluginLandingPageLocalDefault()],
     }),
     AuthAdminModule,
     AuthModule,
