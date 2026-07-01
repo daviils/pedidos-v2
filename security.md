@@ -1,0 +1,378 @@
+# Security Audit Report: `apps/api`
+
+**Data:** 2026-07-01
+
+---
+
+## Sumário
+
+| Severidade | Quantidade |
+|------------|-----------|
+| Crítico | 4 |
+| Alto | 9 |
+| Médio | 10 |
+| Baixo | 5 |
+| Informativo | 4 |
+
+---
+
+## CRÍTICO
+
+### C-01: Secrets em texto puro no `.env` [NÃO AJUSTAR]
+
+**Arquivo:** `apps/api/.env` (linhas 8–32)
+
+**Descrição:** Senha do banco (`Xu6C_0b55hZW`), chave do Azure Storage (`hNVLZPm/...==`), token do Mercado Pago (`TEST-486180...`), webhook secret e API key expostos em texto puro.
+
+**Recomendação:** Usar Azure Key Vault ou secrets manager. Rotacionar todos os secrets imediatamente. Manter apenas `.env.example` no repositório.
+
+---
+
+### C-02: Senhas armazenadas sem hash
+
+**Arquivos:**
+- `apps/api/src/auth/service/auth.service.ts:19`
+- `apps/api/src/auth-admin/service/auth-admin.service.ts:19`
+- `apps/api/src/user/entity/user.entity.ts:37-38`
+- `apps/api/src/user-admin/entity/user-admin.entity.ts:22-23`
+
+**Descrição:** A comparação é feita com `user.password !== password` em texto puro. Não há `bcrypt` ou `argon2` no `package.json`.
+
+**Recomendação:** Adicionar `bcrypt` e fazer hash das senhas antes de salvar no banco.
+
+---
+
+### C-03: JWT secret fraco e hardcoded como fallback
+
+**Arquivo:** `apps/api/src/auth/constant/jwt.constant.ts:2`
+
+**Descrição:** `secret: process.env.JWT_SECRET ?? 'pedidos-api-jwt-secret'` — fallback hardcoded e fraco. O mesmo secret é usado para tokens de usuário e admin.
+
+**Recomendação:** Remover fallback e lançar erro se `JWT_SECRET` não estiver definido. Usar secrets diferentes para user e admin.
+
+---
+
+### C-04: `synchronize: true` habilitado
+
+**Arquivo:** `apps/api/.env:13` e `apps/api/src/app.module.ts:49`
+
+**Descrição:** `TYPEORM_SYNCHRONIZE=true` — o TypeORM altera o schema automaticamente, podendo dropar tabelas/colunas.
+
+**Recomendação:** Forçar `false` em produção. Usar migrations.
+
+---
+
+## ALTO
+
+### H-01: Ausência de `bcrypt`/`argon2` no `package.json`
+
+**Arquivo:** `apps/api/package.json`
+
+**Descrição:** Confirma que nenhuma lib de hash está disponível (relacionado ao C-02).
+
+**Recomendação:** Adicionar `bcrypt` como dependência e hash no `createUser` e no `login`.
+
+---
+
+### H-02: Nenhuma autenticação nos resolvers de User/UserAdmin
+
+**Arquivos:**
+- `apps/api/src/user/resolver/user.resolver.ts` (todos os métodos)
+- `apps/api/src/user-admin/resolver/user-admin.resolver.ts` (todos os métodos)
+
+**Descrição:** Zero decorators `@UseGuards()`. Qualquer pessoa pode criar, listar, atualizar ou deletar usuários e admins.
+
+**Recomendação:** Adicionar `@UseGuards(GqlAuthGuard)` e `@UseGuards(GqlAuthAdminGuard)` nos resolvers apropriados.
+
+---
+
+### H-03: Endpoint de geocode sem autenticação
+
+**Arquivo:** `apps/api/src/open-route-service/controller/open-route-service.controller.ts:42`
+
+**Descrição:** `GET /open-route-service/geocode?address=...` sem guard. Qualquer um pode consumir a API key.
+
+**Recomendação:** Adicionar `@UseGuards`.
+
+---
+
+### H-04: Sem validação de input no geocode
+
+**Arquivo:** `apps/api/src/open-route-service/controller/open-route-service.controller.ts:43`
+
+**Descrição:** O parâmetro `address` só faz `.trim()` — sem limite de tamanho, sem whitelist de caracteres.
+
+**Recomendação:** Adicionar `class-validator` com `@Length()` e `@Matches()`.
+
+---
+
+### H-05: Sem rate limiting
+
+**Arquivo:** Em toda a aplicação.
+
+**Descrição:** Nenhum rate limiter configurado. Endpoints de login, criação de conta e upload estão desprotegidos contra brute-force e DoS.
+
+**Recomendação:** Instalar `@nestjs/throttler` e configurar limites globais e específicos (ex.: 5 tentativas/minuto no login).
+
+---
+
+### H-06: Dependências vulneráveis
+
+**Arquivo:** `apps/api/package-lock.json`
+
+**Descrição:** 10 vulnerabilidades (9 alta, 1 média): `multer` (DoS), `ws` (DoS por fragmentos), `js-yaml` (complexidade quadrática).
+
+**Recomendação:** Rodar `npm audit fix` e atualizar `@nestjs/platform-express` e `@nestjs/graphql`.
+
+---
+
+### H-07: Bypass de assinatura do webhook quando secret não configurado
+
+**Arquivo:** `apps/api/src/mercado-pago/service/mercado-pago.service.ts:441-445`
+
+**Descrição:** Quando `MERCADO_PAGO_WEBHOOK_SECRET` não está definido, `return true` — qualquer requisição é aceita como legítima.
+
+**Recomendação:** Tornar o webhook secret obrigatório e lançar erro se não estiver configurado.
+
+---
+
+### H-08: Informação sensível vazada em erros de serviços externos
+
+**Arquivos:**
+- `apps/api/src/mercado-pago/service/mercado-pago.service.ts:378-382`
+- `apps/api/src/open-route-service/service/open-route-service.service.ts:73-78`
+
+**Descrição:** O corpo da resposta de APIs externas é incluído na mensagem de erro retornada ao cliente.
+
+**Recomendação:** Logar o erro detalhado no servidor, retornar mensagem genérica ao cliente.
+
+---
+
+### H-09: Webhook endpoint sem autenticação
+
+**Arquivo:** `apps/api/src/mercado-pago/controller/mercado-pago.controller.ts:16`
+
+**Descrição:** `POST /mercado-pago/webhook` sem `@UseGuards`. Combinado com H-07, permite fraude financeira.
+
+**Recomendação:** Garantir que o webhook secret esteja sempre configurado. Adicionar whitelist de IPs do Mercado Pago.
+
+---
+
+## MÉDIO
+
+### M-01: CORS permissivo
+
+**Arquivo:** `apps/api/src/main.ts:8`
+
+**Descrição:** `app.enableCors()` sem opções — qualquer origem, header e método são aceitos.
+
+**Recomendação:** Restringir origins aos domínios dos apps admin e web.
+
+---
+
+### M-02: Sem headers de segurança (Helmet)
+
+**Arquivo:** `apps/api/src/main.ts:7-8`
+
+**Descrição:** `helmet` não está instalado/ configurado. Headers como `X-Content-Type-Options`, `X-Frame-Options`, `Strict-Transport-Security` ausentes.
+
+**Recomendação:** Instalar `helmet` e configurar `app.use(helmet())`.
+
+---
+
+### M-03: Swagger exposto sem autenticação
+
+**Arquivo:** `apps/api/src/main.ts:10-19`
+
+**Descrição:** Swagger disponível em `/docs` quando `NODE_ENV !== 'production'` — `NODE_ENV` pode ser facilmente falsificado.
+
+**Recomendação:** Adicionar autenticação ao `/docs` ou desabilitar completamente em produção.
+
+---
+
+### M-04: GraphQL introspection/playground habilitado
+
+**Arquivo:** `apps/api/src/app.module.ts:57-62`
+
+**Descrição:** Apollo Sandbox habilitado fora de produção. Schema completo exposto.
+
+**Recomendação:** Desabilitar introspection em todos os ambientes ou proteger com token admin.
+
+---
+
+### M-05: Validação de MIME type em upload pode ser bypassada
+
+**Arquivo:** `apps/api/src/upload/controller/upload.controller.ts:63-68`
+
+**Descrição:** A validação `file.mimetype.startsWith('image/')` confia no header HTTP enviado pelo cliente. Sem varredura de vírus.
+
+**Recomendação:** Validar magic bytes do arquivo real. Usar `file-type` para detecção por conteúdo.
+
+---
+
+### M-06: SSRF via `back_url` / `notification_url` no Mercado Pago
+
+**Arquivo:** `apps/api/src/mercado-pago/service/mercado-pago.service.ts:306-308`
+
+**Descrição:** O input `CreateMercadoPagoPreferenceInput` permite que o usuário controle URLs de callback.
+
+**Recomendação:** Validar URLs contra whitelist. Usar sempre URLs configuradas no servidor.
+
+---
+
+### M-07: Sem proteção CSRF
+
+**Arquivo:** Em toda a aplicação.
+
+**Descrição:** Nenhum token CSRF ou config `SameSite` em cookies.
+
+**Recomendação:** Implementar CSRF tokens para endpoints REST. Configurar `SameSite=Strict/Lax`.
+
+---
+
+### M-08: Sem limites de tamanho em campos string
+
+**Arquivo:** Todos os DTOs em `src/**/dtos/*.input.ts`
+
+**Descrição:** Campos como `name`, `email`, `password`, `description` aceitam strings de tamanho ilimitado.
+
+**Recomendação:** Adicionar `@Length()`, `@MaxLength()`, `@IsEmail()` com `class-validator`.
+
+---
+
+### M-09: JWT sem claim de role/perfil
+
+**Arquivos:**
+- `apps/api/src/auth/type/jwt-payload.type.ts:1-4`
+- `apps/api/src/auth/service/auth.service.ts:23-26`
+- `apps/api/src/auth-admin/service/auth-admin.service.ts:23-26`
+
+**Descrição:** O payload só contém `sub` e `email` — sem `role` para diferenciar user de admin.
+
+**Recomendação:** Adicionar `role` ao payload. Usar diferentes secrets ou `audience` para user vs admin.
+
+---
+
+### M-10: Sem logging ou audit trail
+
+**Arquivo:** Em toda a aplicação.
+
+**Descrição:** Eventos de segurança (login, criação de conta, alteração de dados) não são logados.
+
+**Recomendação:** Usar `Logger` do NestJS ou `winston`/`pino`. Logar tentativas de auth, mutações sensíveis e uploads.
+
+---
+
+## BAIXO
+
+### L-01: Trust server certificate desabilitado
+
+**Arquivo:** `apps/api/.env:16` e `apps/api/src/app.module.ts:52-53`
+
+**Descrição:** `DATABASE_TRUST_SERVER_CERTIFICATE=true` — MITM possível na conexão com o banco.
+
+**Recomendação:** Usar certificado TLS válido e desabilitar trust.
+
+---
+
+### L-02: `.env` presente no disco
+
+**Arquivo:** `apps/api/.env`
+
+**Descrição:** Arquivo com secrets no sistema de arquivos, sujeito a backups, screenshots, pacotes de deploy.
+
+**Recomendação:** Remover do diretório do projeto. Usar variáveis de ambiente no OS/container.
+
+---
+
+### L-03: `noImplicitAny: false` no tsconfig
+
+**Arquivo:** `apps/api/tsconfig.json:9`
+
+**Descrição:** TypeScript permite `any` implícito, reduzindo type safety.
+
+**Recomendação:** Habilitar `"noImplicitAny": true` e idealmente `"strict": true`.
+
+---
+
+### L-04: Inconsistência entre soft e hard delete
+
+**Arquivos:** `category.service.ts`, `table.service.ts` (soft); `user.service.ts`, `user-admin.service.ts`, `order.service.ts` (hard)
+
+**Descrição:** Algumas entidades usam soft-delete, outras hard-delete. Perda permanente de dados em algumas operações.
+
+**Recomendação:** Padronizar para soft-delete com auditoria.
+
+---
+
+### L-05: Sem limite de tamanho do body da requisição
+
+**Arquivo:** `apps/api/src/main.ts`
+
+**Descrição:** Sem `express.json({ limit })`. GraphQL queries complexas podem causar DoS por memória.
+
+**Recomendação:** Configurar `app.use(express.json({ limit: '1mb' }))` e adicionar limitador de profundidade de queries GraphQL.
+
+---
+
+## INFORMATIVO
+
+### I-01: Helmet não instalado
+
+**Arquivo:** `apps/api/src/main.ts`
+
+**Recomendação:** Instalar e configurar `helmet` para headers de segurança.
+
+---
+
+### I-02: Nenhum teste configurado
+
+**Arquivo:** `apps/api/package.json`
+
+**Recomendação:** Adicionar Jest e escrever testes para auth, guards, validators e services.
+
+---
+
+### I-03: Database credentials hardcoded como fallback
+
+**Arquivo:** `apps/api/src/app.module.ts:44-47`
+
+**Descrição:** Fallbacks `localhost`/`sa`/`password`. Se env vars faltarem, conecta com credenciais padrão.
+
+**Recomendação:** Validar env vars obrigatórias no startup e falhar rápido.
+
+---
+
+### I-04: Dockerfile ausente
+
+**Descrição:** Sem configuração de deploy containerizado para revisão.
+
+**Recomendação:** Criar Dockerfile com multi-stage build, usuário não-root e sem inclusão de `.env`.
+
+---
+
+## Dependências Vulneráveis
+
+| Pacote | Severidade | CVE | Versão Afetada |
+|--------|-----------|-----|----------------|
+| `multer` | ALTA | GHSA-72gw-mp4g-v24j | 1.0.0–2.1.1 |
+| `multer` | ALTA | GHSA-3p4h-7m6x-2hcm | 1.0.0–2.1.1 |
+| `ws` | ALTA | GHSA-96hv-2xvq-fx4p | 8.0.0–8.20.1 |
+| `js-yaml` | MÉDIA | GHSA-h67p-54hq-rp68 | 4.0.0–4.1.1 |
+
+**Total: 10 vulnerabilidades (9 alta, 1 média)**
+
+---
+
+## Recomendações de ação imediata
+
+1. **IMEDIATO** — Rotacionar todos os secrets expostos no `.env`
+2. **IMEDIATO** — Fazer hash das senhas com `bcrypt`
+3. **ALTA** — Adicionar `@UseGuards()` nos resolvers de User e UserAdmin
+4. **ALTA** — Adicionar rate limiting (especialmente no login)
+5. **ALTA** — Remover fallback hardcoded do JWT secret
+6. **ALTA** — Forçar `TYPEORM_SYNCHRONIZE=false` em produção
+7. **MÉDIA** — Restringir CORS a origins específicas
+8. **MÉDIA** — Adicionar `helmet`
+9. **MÉDIA** — Adicionar validação de input com `class-validator`
+10. **BAIXA** — Habilitar `noImplicitAny: true` no tsconfig

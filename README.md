@@ -3,5 +3,5 @@
 ## opencode-shell
 
 ```bash
-./opencode-shell/hello.sh
+./opencode-shell/run.sh
 ```
