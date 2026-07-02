@@ -1,6 +1,6 @@
 # Security Audit Report: `apps/api`
 
-**Data:** 2026-07-01
+**Data:** 2026-07-02
 
 ---
 
@@ -8,8 +8,8 @@
 
 | Severidade | Quantidade |
 |------------|-----------|
-| Crítico | 4 |
-| Alto | 9 |
+| Crítico | 8 |
+| Alto | 10 |
 | Médio | 10 |
 | Baixo | 5 |
 | Informativo | 4 |
@@ -28,17 +28,16 @@
 
 ---
 
-### C-02: Senhas armazenadas sem hash
+### C-02: Senhas armazenadas sem hash (plaintext)
 
 **Arquivos:**
-- `apps/api/src/auth/service/auth.service.ts:19`
-- `apps/api/src/auth-admin/service/auth-admin.service.ts:19`
-- `apps/api/src/user/entity/user.entity.ts:37-38`
-- `apps/api/src/user-admin/entity/user-admin.entity.ts:22-23`
+- `apps/api/src/auth/service/auth.service.ts:19` — `user.password !== password`
+- `apps/api/src/auth-admin/service/auth-admin.service.ts:19` — `userAdmin.password !== password`
+- `apps/api/src/user/service/user.service.ts:17-22` — `create()` salva plaintext no banco
 
-**Descrição:** A comparação é feita com `user.password !== password` em texto puro. Não há `bcrypt` ou `argon2` no `package.json`.
+**Descrição:** A comparação é feita com `!==` em texto puro. Não há `bcrypt` ou `argon2` no `package.json`. Se o banco for comprometido, todas as senhas são expostas.
 
-**Recomendação:** Adicionar `bcrypt` e fazer hash das senhas antes de salvar no banco.
+**Recomendação:** Adicionar `bcrypt` e fazer hash das senhas antes de salvar. Usar `bcrypt.compare()` no login.
 
 ---
 
@@ -46,9 +45,9 @@
 
 **Arquivo:** `apps/api/src/auth/constant/jwt.constant.ts:2`
 
-**Descrição:** `secret: process.env.JWT_SECRET ?? 'pedidos-api-jwt-secret'` — fallback hardcoded e fraco. O mesmo secret é usado para tokens de usuário e admin.
+**Descrição:** `secret: process.env.JWT_SECRET ?? 'pedidos-api-jwt-secret'` — fallback hardcoded e fraco.
 
-**Recomendação:** Remover fallback e lançar erro se `JWT_SECRET` não estiver definido. Usar secrets diferentes para user e admin.
+**Recomendação:** Remover fallback e lançar erro se `JWT_SECRET` não estiver definido.
 
 ---
 
@@ -56,9 +55,53 @@
 
 **Arquivo:** `apps/api/.env:13` e `apps/api/src/app.module.ts:49`
 
-**Descrição:** `TYPEORM_SYNCHRONIZE=true` — o TypeORM altera o schema automaticamente, podendo dropar tabelas/colunas.
+**Descrição:** `TYPEORM_SYNCHRONIZE=true` — o TypeORM altera o schema automaticamente, podendo dropar tabelas/colunas em produção.
 
 **Recomendação:** Forçar `false` em produção. Usar migrations.
+
+---
+
+### C-05: Nenhuma autenticação nos resolvers de User/UserAdmin
+
+**Arquivos:**
+- `apps/api/src/user/resolver/user.resolver.ts` (todos os métodos)
+- `apps/api/src/user-admin/resolver/user-admin.resolver.ts` (todos os métodos)
+
+**Descrição:** Zero decorators `@UseGuards()`. Qualquer pessoa pode criar, listar, atualizar ou deletar usuários e admins. Não há verificação de ownership (IDOR).
+
+**Recomendação:** Adicionar `@UseGuards(GqlAuthGuard)` / `@UseGuards(GqlAuthAdminGuard)` nos resolvers. Verificar ownership nas mutações update/delete.
+
+---
+
+### C-06: Criação de admin sem autenticação
+
+**Arquivo:** `apps/api/src/user-admin/resolver/user-admin.resolver.ts:12-17`
+
+**Descrição:** `createUserAdmin()` não tem `@UseGuards`. Qualquer pessoa não autenticada pode criar uma conta de administrador.
+
+**Recomendação:** Adicionar `@UseGuards(GqlAuthAdminGuard)` na mutation `createUserAdmin`.
+
+---
+
+### C-07: Insecure Direct Object Reference (IDOR) em User/UserAdmin
+
+**Arquivos:**
+- `apps/api/src/user/resolver/user.resolver.ts:22-38`
+- `apps/api/src/user-admin/resolver/user-admin.resolver.ts:24-44`
+
+**Descrição:** Qualquer ID passado como argumento é usado diretamente no banco sem verificar se o usuário logado tem permissão. Um usuário pode ler/alterar/deletar contas de outros usuários.
+
+**Recomendação:** Extrair o `sub` (user ID) do JWT e usá-lo nas queries, ignorando o `id` da requisição quando aplicável.
+
+---
+
+### C-08: Dados sensíveis comprometidos no `.env` versionado
+
+**Arquivo:** `apps/api/.env` (committed no repositório Git)
+
+**Descrição:** O arquivo `.env` com credenciais reais está no histórico do Git. Qualquer pessoa com acesso ao repositório (ou ao histórico) obtém acesso ao banco, storage e gateway de pagamento.
+
+**Recomendação:** Remover do histórico com `git filter-branch` ou `bfg`. Adicionar `.env` ao `.gitignore`.
 
 ---
 
@@ -74,15 +117,15 @@
 
 ---
 
-### H-02: Nenhuma autenticação nos resolvers de User/UserAdmin
+### H-02: CORS permissivo (wildcard) [RESOLVIDO]
 
-**Arquivos:**
-- `apps/api/src/user/resolver/user.resolver.ts` (todos os métodos)
-- `apps/api/src/user-admin/resolver/user-admin.resolver.ts` (todos os métodos)
+**Arquivo:** `apps/api/src/main.ts:8`
 
-**Descrição:** Zero decorators `@UseGuards()`. Qualquer pessoa pode criar, listar, atualizar ou deletar usuários e admins.
+**Descrição:** `app.enableCors()` sem opções — qualquer origem, header e método são aceitos. Combinado com a ausência de CSRF, permite ataques cross-origin.
 
-**Recomendação:** Adicionar `@UseGuards(GqlAuthGuard)` e `@UseGuards(GqlAuthAdminGuard)` nos resolvers apropriados.
+**Recomendação:** Restringir origins aos domínios dos apps admin e web (`credentials: true` com origens específicas).
+
+**Resolvido em:** `main.ts` — `enableCors()` agora aceita `CORS_ORIGINS` do env ou fallback para `localhost:4200,4201` com `credentials: true`.
 
 ---
 
@@ -148,49 +191,49 @@
 
 ---
 
-### H-09: Webhook endpoint sem autenticação
+### H-09: Mass assignment via `Object.assign`
 
-**Arquivo:** `apps/api/src/mercado-pago/controller/mercado-pago.controller.ts:16`
+**Arquivos:** Múltiplos services (`user.service.ts`, `user-admin.service.ts`, `category.service.ts`, `product.service.ts`, `table.service.ts`, `table-session.service.ts`, `subscription.service.ts`, `delivery-fee.service.ts`, `user-address.service.ts`, `user-admin-address.service.ts`)
 
-**Descrição:** `POST /mercado-pago/webhook` sem `@UseGuards`. Combinado com H-07, permite fraude financeira.
+**Descrição:** `Object.assign(entity, data)` copia todas as propriedades do input para a entidade. Se um campo sensível for adicionado ao DTO no futuro (ex.: `role`, `isAdmin`), ele se torna imediatamente atribuível sem mapeamento explícito.
 
-**Recomendação:** Garantir que o webhook secret esteja sempre configurado. Adicionar whitelist de IPs do Mercado Pago.
+**Recomendação:** Substituir por atribuição explícita campo a campo ou usar `pick()` do lodash.
+
+---
+
+### H-10: Sem proteção CSRF
+
+**Arquivo:** Em toda a aplicação.
+
+**Descrição:** Nenhum token CSRF ou config `SameSite` em cookies. Combinado com CORS permissivo, qualquer site pode fazer requisições na API do usuário logado.
+
+**Recomendação:** Implementar CSRF tokens para endpoints REST. Configurar `SameSite=Strict/Lax`.
 
 ---
 
 ## MÉDIO
 
-### M-01: CORS permissivo
-
-**Arquivo:** `apps/api/src/main.ts:8`
-
-**Descrição:** `app.enableCors()` sem opções — qualquer origem, header e método são aceitos.
-
-**Recomendação:** Restringir origins aos domínios dos apps admin e web.
-
----
-
-### M-02: Sem headers de segurança (Helmet)
+### M-01: Sem headers de segurança (Helmet)
 
 **Arquivo:** `apps/api/src/main.ts:7-8`
 
-**Descrição:** `helmet` não está instalado/ configurado. Headers como `X-Content-Type-Options`, `X-Frame-Options`, `Strict-Transport-Security` ausentes.
+**Descrição:** `helmet` não está instalado/configurado. Headers como `X-Content-Type-Options`, `X-Frame-Options`, `Strict-Transport-Security` ausentes.
 
 **Recomendação:** Instalar `helmet` e configurar `app.use(helmet())`.
 
 ---
 
-### M-03: Swagger exposto sem autenticação
+### M-02: Swagger exposto sem autenticação
 
 **Arquivo:** `apps/api/src/main.ts:10-19`
 
-**Descrição:** Swagger disponível em `/docs` quando `NODE_ENV !== 'production'` — `NODE_ENV` pode ser facilmente falsificado.
+**Descrição:** Swagger disponível em `/docs` quando `NODE_ENV !== 'production'` — `NODE_ENV` pode ser falsificado.
 
 **Recomendação:** Adicionar autenticação ao `/docs` ou desabilitar completamente em produção.
 
 ---
 
-### M-04: GraphQL introspection/playground habilitado
+### M-03: GraphQL introspection/playground habilitado
 
 **Arquivo:** `apps/api/src/app.module.ts:57-62`
 
@@ -200,13 +243,23 @@
 
 ---
 
-### M-05: Validação de MIME type em upload pode ser bypassada
+### M-04: Validação de MIME type em upload pode ser bypassada
 
 **Arquivo:** `apps/api/src/upload/controller/upload.controller.ts:63-68`
 
 **Descrição:** A validação `file.mimetype.startsWith('image/')` confia no header HTTP enviado pelo cliente. Sem varredura de vírus.
 
 **Recomendação:** Validar magic bytes do arquivo real. Usar `file-type` para detecção por conteúdo.
+
+---
+
+### M-05: Extensão de arquivo não validada no upload
+
+**Arquivo:** `apps/api/src/upload/service/upload.service.ts:33-34`
+
+**Descrição:** A extensão vem diretamente do `file.originalname` sem whitelist. Um arquivo `malicioso.jpg.exe` pode ser salvo.
+
+**Recomendação:** Whitelist de extensões permitidas (`.jpg`, `.png`, `.webp`). Ignorar a extensão original.
 
 ---
 
@@ -220,27 +273,17 @@
 
 ---
 
-### M-07: Sem proteção CSRF
-
-**Arquivo:** Em toda a aplicação.
-
-**Descrição:** Nenhum token CSRF ou config `SameSite` em cookies.
-
-**Recomendação:** Implementar CSRF tokens para endpoints REST. Configurar `SameSite=Strict/Lax`.
-
----
-
-### M-08: Sem limites de tamanho em campos string
+### M-07: Sem limites de tamanho em campos string
 
 **Arquivo:** Todos os DTOs em `src/**/dtos/*.input.ts`
 
-**Descrição:** Campos como `name`, `email`, `password`, `description` aceitam strings de tamanho ilimitado.
+**Descrição:** Campos como `name`, `email`, `password`, `description` aceitam strings de tamanho ilimitado. Sem `class-validator` em nenhum DTO.
 
-**Recomendação:** Adicionar `@Length()`, `@MaxLength()`, `@IsEmail()` com `class-validator`.
+**Recomendação:** Adicionar `@Length()`, `@MaxLength()`, `@IsEmail()`, `@IsString()` com `class-validator`.
 
 ---
 
-### M-09: JWT sem claim de role/perfil
+### M-08: JWT sem claim de role/perfil
 
 **Arquivos:**
 - `apps/api/src/auth/type/jwt-payload.type.ts:1-4`
@@ -253,13 +296,23 @@
 
 ---
 
-### M-10: Sem logging ou audit trail
+### M-09: Sem logging ou audit trail
 
 **Arquivo:** Em toda a aplicação.
 
 **Descrição:** Eventos de segurança (login, criação de conta, alteração de dados) não são logados.
 
-**Recomendação:** Usar `Logger` do NestJS ou `winston`/`pino`. Logar tentativas de auth, mutações sensíveis e uploads.
+**Recomendação:** Usar `Logger` do NestJS. Logar tentativas de auth, mutações sensíveis e uploads.
+
+---
+
+### M-10: Sem autenticação nas queries de Subscription
+
+**Arquivo:** `apps/api/src/subscription/resolver/subscription.resolver.ts:22-32`
+
+**Descrição:** `subscriptions()` e `subscription()` não têm `@UseGuards`. Dados de preço e descrição expostos publicamente.
+
+**Recomendação:** Avaliar se deve ser público. Se for interno, adicionar guard.
 
 ---
 
@@ -366,13 +419,13 @@
 
 ## Recomendações de ação imediata
 
-1. **IMEDIATO** — Rotacionar todos os secrets expostos no `.env`
-2. **IMEDIATO** — Fazer hash das senhas com `bcrypt`
-3. **ALTA** — Adicionar `@UseGuards()` nos resolvers de User e UserAdmin
-4. **ALTA** — Adicionar rate limiting (especialmente no login)
-5. **ALTA** — Remover fallback hardcoded do JWT secret
-6. **ALTA** — Forçar `TYPEORM_SYNCHRONIZE=false` em produção
-7. **MÉDIA** — Restringir CORS a origins específicas
-8. **MÉDIA** — Adicionar `helmet`
-9. **MÉDIA** — Adicionar validação de input com `class-validator`
-10. **BAIXA** — Habilitar `noImplicitAny: true` no tsconfig
+1. **IMEDIATO** — Rotacionar todos os secrets expostos no `.env` (C-01, C-08)
+2. **IMEDIATO** — Fazer hash das senhas com `bcrypt` (C-02)
+3. **IMEDIATO** — Adicionar `@UseGuards()` nos resolvers de User e UserAdmin (C-05, C-06)
+4. **ALTA** — Adicionar rate limiting (especialmente no login) (H-05)
+5. **ALTA** — Remover fallback hardcoded do JWT secret (C-03)
+6. **ALTA** — Forçar `TYPEORM_SYNCHRONIZE=false` em produção (C-04)
+7. **ALTA** — Restringir CORS a origins específicas (H-02)
+8. **ALTA** — Substituir `Object.assign` por atribuição explícita (H-09)
+9. **MÉDIA** — Adicionar `helmet` (M-01)
+10. **MÉDIA** — Adicionar validação de input com `class-validator` (M-07)
