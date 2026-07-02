@@ -9,10 +9,10 @@
 | Severidade | Quantidade |
 |------------|-----------|
 | Crítico | 8 |
-| Alto | 10 |
-| Médio | 10 |
-| Baixo | 5 |
-| Informativo | 4 |
+| Alto | 11 |
+| Médio | 11 |
+| Baixo | 7 |
+| Informativo | 8 |
 
 ---
 
@@ -34,6 +34,7 @@
 - `apps/api/src/auth/service/auth.service.ts:19` — `user.password !== password`
 - `apps/api/src/auth-admin/service/auth-admin.service.ts:19` — `userAdmin.password !== password`
 - `apps/api/src/user/service/user.service.ts:17-22` — `create()` salva plaintext no banco
+- `apps/api/src/user-admin/service/user-admin.service.ts:16-19`
 
 **Descrição:** A comparação é feita com `!==` em texto puro. Não há `bcrypt` ou `argon2` no `package.json`. Se o banco for comprometido, todas as senhas são expostas.
 
@@ -159,13 +160,20 @@
 
 ---
 
-### H-06: Dependências vulneráveis
+### H-06: Dependências vulneráveis (npm audit)
 
 **Arquivo:** `apps/api/package-lock.json`
 
-**Descrição:** 10 vulnerabilidades (9 alta, 1 média): `multer` (DoS), `ws` (DoS por fragmentos), `js-yaml` (complexidade quadrática).
+**Descrição:** 10 vulnerabilidades (9 alta, 1 média):
 
-**Recomendação:** Rodar `npm audit fix` e atualizar `@nestjs/platform-express` e `@nestjs/graphql`.
+| Pacote | Severidade | CVE / GHSA | Versão Afetada |
+|--------|-----------|------------|----------------|
+| `multer` | ALTA | GHSA-72gw-mp4g-v24j (DoS fields aninhados) | 1.0.0–2.1.1 |
+| `multer` | ALTA | GHSA-3p4h-7m6x-2hcm (DoS cleanup incompleto) | 1.0.0–2.1.1 |
+| `ws` | ALTA | GHSA-96hv-2xvq-fx4p (DoS memory exhaustion) | 8.0.0–8.20.1 |
+| `js-yaml` | MÉDIA | GHSA-h67p-54hq-rp68 (complexidade quadrática) | 4.0.0–4.1.1 |
+
+**Recomendação:** Rodar `npm audit fix`. `multer` e `ws` exigem `--force` (breaking changes em `@nestjs/platform-express` e `@nestjs/graphql`). Avaliar atualização manual controlada.
 
 ---
 
@@ -211,15 +219,25 @@
 
 ---
 
+### H-11: Mutation `updateUser`/`updateUserAdmin` permite troca de senha sem confirmação da senha atual
+
+**Arquivos:**
+- `apps/api/src/user/dtos/update-user.input.ts` (extende `PartialType(CreateUserInput)`)
+- `apps/api/src/user-admin/dtos/update-user-admin.input.ts`
+
+**Descrição:** O input de update inclui `password` sem exigir a senha atual. Qualquer sessão autenticada pode alterar a senha sem verificação.
+
+**Recomendação:** Separar `changePassword` em mutation própria, exigindo `currentPassword` + `newPassword`.
+
+---
+
 ## MÉDIO
 
-### M-01: Sem headers de segurança (Helmet)
+### M-01: Sem headers de segurança (Helmet) [RESOLVIDO]
 
-**Arquivo:** `apps/api/src/main.ts:7-8`
+**Arquivo:** `apps/api/src/main.ts:8`
 
-**Descrição:** `helmet` não está instalado/configurado. Headers como `X-Content-Type-Options`, `X-Frame-Options`, `Strict-Transport-Security` ausentes.
-
-**Recomendação:** Instalar `helmet` e configurar `app.use(helmet())`.
+**Descrição:** `helmet` instalado e configurado com `app.use(helmet())`. Headers de segurança agora são enviados em todas as respostas.
 
 ---
 
@@ -316,6 +334,16 @@
 
 ---
 
+### M-11: JWT com expiração longa (1d) sem refresh token
+
+**Arquivo:** `apps/api/src/auth/constant/jwt.constant.ts:11`
+
+**Descrição:** Token expira em 24h. Sem mecanismo de revogação (blacklist/refresh). Se o token vazar, o atacante tem acesso por até 24h.
+
+**Recomendação:** Reduzir para 15-60min e implementar refresh token com rotação.
+
+---
+
 ## BAIXO
 
 ### L-01: Trust server certificate desabilitado
@@ -368,6 +396,26 @@
 
 ---
 
+### L-06: Credenciais padrão do banco como fallback no código
+
+**Arquivo:** `apps/api/src/app.module.ts:43-47`
+
+**Descrição:** Fallbacks `localhost`/`sa`/`password` para host/username/password do banco. Se env vars faltarem em produção, conecta com credenciais default.
+
+**Recomendação:** Remover fallbacks e validar env vars obrigatórias no startup.
+
+---
+
+### L-07: Sem query cost analysis / depth limiting no GraphQL
+
+**Arquivo:** `apps/api/src/app.module.ts:57-62`
+
+**Descrição:** Nenhuma proteção contra queries profundas ou caras. Possível DoS via GraphQL.
+
+**Recomendação:** Implementar `@nestjs/graphql` plugins de depth limiting e query cost analysis.
+
+---
+
 ## INFORMATIVO
 
 ### I-01: Helmet não instalado
@@ -404,16 +452,33 @@
 
 ---
 
-## Dependências Vulneráveis
+### I-05: Senhas NÃO expostas no schema GraphQL (bom)
 
-| Pacote | Severidade | CVE | Versão Afetada |
-|--------|-----------|-----|----------------|
-| `multer` | ALTA | GHSA-72gw-mp4g-v24j | 1.0.0–2.1.1 |
-| `multer` | ALTA | GHSA-3p4h-7m6x-2hcm | 1.0.0–2.1.1 |
-| `ws` | ALTA | GHSA-96hv-2xvq-fx4p | 8.0.0–8.20.1 |
-| `js-yaml` | MÉDIA | GHSA-h67p-54hq-rp68 | 4.0.0–4.1.1 |
+**Entidades:** `User` e `UserAdmin`
 
-**Total: 10 vulnerabilidades (9 alta, 1 média)**
+**Descrição:** O campo `password` nas entidades não tem `@Field()`, portanto não é exposto via GraphQL.
+
+---
+
+### I-06: Sem raw SQL — TypeORM repository pattern (bom)
+
+**Descrição:** Todas as queries usam TypeORM repository. Zero raw SQL ou concatenação de strings em queries.
+
+---
+
+### I-07: Geocode usa `encodeURIComponent` (bom)
+
+**Arquivo:** `apps/api/src/open-route-service/service/open-route-service.service.ts:41`
+
+**Descrição:** O parâmetro `address` é corretamente escapado com `encodeURIComponent()` antes de ser usado na URL.
+
+---
+
+### I-08: Webhook usa comparação timing-safe (bom)
+
+**Arquivo:** `apps/api/src/mercado-pago/service/mercado-pago.service.ts:473`
+
+**Descrição:** A validação de assinatura do webhook usa `timingSafeEqual()` para comparação de hashes, prevenindo timing attacks.
 
 ---
 
@@ -427,5 +492,8 @@
 6. **ALTA** — Forçar `TYPEORM_SYNCHRONIZE=false` em produção (C-04)
 7. **ALTA** — Restringir CORS a origins específicas (H-02)
 8. **ALTA** — Substituir `Object.assign` por atribuição explícita (H-09)
-9. **MÉDIA** — Adicionar `helmet` (M-01)
-10. **MÉDIA** — Adicionar validação de input com `class-validator` (M-07)
+9. **ALTA** — Rodar `npm audit fix` nas dependências (H-06)
+10. **MÉDIA** — Adicionar `helmet` (M-01)
+11. **MÉDIA** — Adicionar validação de input com `class-validator` (M-07)
+12. **MÉDIA** — Separar mutation `changePassword` com confirmação (H-11)
+13. **MÉDIA** — Reduzir expiração do JWT e implementar refresh token (M-11)

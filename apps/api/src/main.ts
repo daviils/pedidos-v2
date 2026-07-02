@@ -1,3 +1,4 @@
+import helmet from 'helmet';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
@@ -11,6 +12,8 @@ async function bootstrap() {
       : ['http://localhost:4200', 'http://localhost:4201'],
     credentials: true,
   });
+
+  app.use(helmet());
 
   if (process.env.NODE_ENV !== 'production') {
     const swaggerConfig = new DocumentBuilder()

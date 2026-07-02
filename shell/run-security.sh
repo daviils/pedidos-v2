@@ -1,5 +1,5 @@
 #!/bin/bash
-./opencode-shell/init.sh
+./shell/global/init.sh
 
 echo "execultado prompt..."
 
@@ -8,5 +8,5 @@ opencode run --continue "ler memory/run-security.md escolher o mais facil de imp
 
 echo "execultado"
 
-./opencode-shell/finish.sh
+./shell/global/finish.sh
 
