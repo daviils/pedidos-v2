@@ -1,0 +1,108 @@
+<section class="store-page">
+  <div class="store-page__header">
+    <div>
+      <h1>Lojas</h1>
+      <p>Lista de lojas cadastradas.</p>
+    </div>
+
+    <div class="store-page__actions">
+      <a class="btn btn-dark" routerLink="create">Criar loja</a>
+
+      <button
+        type="button"
+        class="btn btn-outline-dark"
+        [disabled]="isLoading"
+        (click)="loadStores()"
+      >
+        Atualizar
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger py-2">
+    {{ errorMessage }}
+  </div>
+
+  <div class="store-page__filter">
+    <label for="store-filter" class="form-label fw-semibold">Filtro</label>
+    <input
+      id="store-filter"
+      type="search"
+      class="form-control"
+      placeholder="Buscar por nome, descricao, telefone ou endereco"
+      [(ngModel)]="filter"
+    />
+  </div>
+
+  <div class="table-responsive store-page__table">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th scope="col">Nome</th>
+          <th scope="col">Descricao</th>
+          <th scope="col">Telefone</th>
+          <th scope="col">Endereco</th>
+          <th scope="col">Ativo</th>
+          <th scope="col" class="text-end">Acoes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="isLoading">
+          <td colspan="6" class="text-center text-muted py-4">
+            Carregando lojas...
+          </td>
+        </tr>
+
+        <tr *ngIf="!isLoading && filteredStores.length === 0">
+          <td colspan="6" class="text-center text-muted py-4">
+            Nenhuma loja encontrada.
+          </td>
+        </tr>
+
+        <tr
+          *ngFor="let store of filteredStores"
+          class="store-page__row"
+        >
+          <td class="fw-semibold">{{ store.name }}</td>
+          <td>
+            <span class="store-page__description">
+              {{ store.description }}
+            </span>
+          </td>
+          <td>{{ store.phone }}</td>
+          <td>
+            <span class="store-page__description">
+              {{ store.address }}
+            </span>
+          </td>
+          <td>
+            <span
+              class="badge"
+              [class.bg-success]="store.isActive"
+              [class.bg-danger]="!store.isActive"
+            >
+              {{ store.isActive ? 'Sim' : 'Nao' }}
+            </span>
+          </td>
+          <td class="text-end">
+            <a
+              class="btn btn-sm btn-outline-dark me-2"
+              [routerLink]="['edit', store.id]"
+              title="Editar"
+            >
+              <span class="material-icons align-middle fs-6">edit</span>
+            </a>
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-danger"
+              (click)="deleteStore(store.id)"
+              title="Excluir"
+            >
+              <span class="material-icons align-middle fs-6">delete</span>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

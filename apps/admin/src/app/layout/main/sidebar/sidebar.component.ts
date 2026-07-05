@@ -22,6 +22,7 @@ export class SidebarComponent {
     { path: '/home', label: 'Home', icon: 'home' },
     { path: '/order', label: 'Pedidos', icon: 'receipt_long' },
     { path: '/product', label: 'Produtos', icon: 'inventory_2' },
+    { path: '/store', label: 'Lojas', icon: 'store' },
     { path: '/category', label: 'Categorias', icon: 'category' },
     { path: '/table', label: 'Mesas', icon: 'table_restaurant' },
     { path: '/table-session', label: 'Sessoes', icon: 'meeting_room' },

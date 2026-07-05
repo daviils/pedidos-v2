@@ -1,0 +1,103 @@
+<section class="store-detail-page">
+  <div class="store-detail-page__header">
+    <div>
+      <h1>{{ storeId ? 'Editar loja' : 'Criar loja' }}</h1>
+      <p>{{ storeId ? 'Altere os dados da loja.' : 'Cadastre uma nova loja.' }}</p>
+    </div>
+
+    <a class="btn btn-outline-dark" routerLink="/store">Voltar</a>
+  </div>
+
+  <form
+    class="store-detail-page__form"
+    #storeForm="ngForm"
+    (ngSubmit)="submit(storeForm)"
+  >
+    <div *ngIf="isLoading" class="alert alert-secondary py-2">
+      Carregando loja...
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger py-2">
+      {{ errorMessage }}
+    </div>
+
+    <div class="mb-3">
+      <label for="name" class="form-label fw-semibold">Nome</label>
+      <input
+        id="name"
+        name="name"
+        type="text"
+        class="form-control"
+        required
+        [(ngModel)]="store.name"
+        #name="ngModel"
+      />
+      <div
+        *ngIf="name.invalid && name.touched"
+        class="form-text text-danger"
+      >
+        Informe o nome da loja.
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="description" class="form-label fw-semibold">Descricao</label>
+      <textarea
+        id="description"
+        name="description"
+        class="form-control"
+        rows="4"
+        [(ngModel)]="store.description"
+        #description="ngModel"
+      ></textarea>
+    </div>
+
+    <div class="mb-3">
+      <label for="phone" class="form-label fw-semibold">Telefone</label>
+      <input
+        id="phone"
+        name="phone"
+        type="text"
+        class="form-control"
+        [(ngModel)]="store.phone"
+        #phone="ngModel"
+      />
+    </div>
+
+    <div class="mb-3">
+      <label for="address" class="form-label fw-semibold">Endereco</label>
+      <input
+        id="address"
+        name="address"
+        type="text"
+        class="form-control"
+        [(ngModel)]="store.address"
+        #address="ngModel"
+      />
+    </div>
+
+    <div class="mb-3 form-check form-switch">
+      <input
+        id="isActive"
+        name="isActive"
+        type="checkbox"
+        class="form-check-input"
+        role="switch"
+        [(ngModel)]="store.isActive"
+        #isActive="ngModel"
+      />
+      <label for="isActive" class="form-check-label fw-semibold">Ativo</label>
+    </div>
+
+    <div class="store-detail-page__actions">
+      <a class="btn btn-outline-secondary" routerLink="/store">Cancelar</a>
+      <button
+        type="submit"
+        class="btn btn-dark"
+        [disabled]="isSubmitting"
+      >
+        {{ isSubmitting ? 'Salvando...' : 'Salvar loja' }}
+      </button>
+    </div>
+  </form>
+</section>

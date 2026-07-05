@@ -51,6 +51,13 @@ const routes: Routes = [
           ),
       },
       {
+        path: 'store',
+        loadChildren: () =>
+          import('../../modules/store/store.module').then(
+            (module) => module.StoreModule,
+          ),
+      },
+      {
         path: 'table-session',
         loadChildren: () =>
           import('../../modules/table-session/table-session.module').then(
