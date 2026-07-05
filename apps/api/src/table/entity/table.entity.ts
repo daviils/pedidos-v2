@@ -4,9 +4,13 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+
+import { Store } from '../../store/entity/store.entity';
 
 export enum TableStatus {
   Open = 'open',
@@ -23,6 +27,10 @@ export class Table {
   @Field(() => String)
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @Field(() => String)
+  @Column()
+  storeId: string;
 
   @Field(() => String)
   @Column()
@@ -47,4 +55,9 @@ export class Table {
   @Field(() => Date, { nullable: true })
   @DeleteDateColumn({ nullable: true })
   deletedAt: Date | null;
+
+  @Field(() => Store)
+  @ManyToOne(() => Store, (store) => store.tables)
+  @JoinColumn({ name: 'storeId' })
+  store: Store;
 }

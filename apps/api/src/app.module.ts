@@ -17,6 +17,7 @@ import { MercadoPagoModule } from './mercado-pago/mercado-pago.module';
 import { OpenRouteServiceModule } from './open-route-service/open-route-service.module';
 import { OrderModule } from './order/order.module';
 import { ProductModule } from './product/product.module';
+import { StoreModule } from './store/store.module';
 import { SubscriptionModule } from './subscription/subscription.module';
 import { TableModule } from './table/table.module';
 import { TableSessionModule } from './table-session/table-session.module';
@@ -69,6 +70,7 @@ const isProduction = process.env.NODE_ENV === 'production';
     OpenRouteServiceModule,
     OrderModule,
     ProductModule,
+    StoreModule,
     SubscriptionModule,
     TableModule,
     TableSessionModule,

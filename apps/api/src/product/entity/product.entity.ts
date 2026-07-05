@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 
 import { Category } from '../../category/entity/category.entity';
+import { Store } from '../../store/entity/store.entity';
 
 @Entity('products')
 @ObjectType()
@@ -15,6 +16,10 @@ export class Product {
   @Field(() => String)
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @Field(() => String)
+  @Column()
+  storeId: string;
 
   @Field(() => String)
   @Column()
@@ -35,6 +40,11 @@ export class Product {
   @Field(() => String, { nullable: true })
   @Column({ nullable: true })
   categoryId: string | null;
+
+  @Field(() => Store)
+  @ManyToOne(() => Store, (store) => store.products)
+  @JoinColumn({ name: 'storeId' })
+  store: Store;
 
   @Field(() => Category, { nullable: true })
   @ManyToOne(() => Category, (category) => category.products)

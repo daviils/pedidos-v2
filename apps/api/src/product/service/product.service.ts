@@ -13,9 +13,10 @@ export class ProductService {
     private readonly productRepository: Repository<Product>,
   ) {}
 
-  async create(data: CreateProductInput): Promise<Product> {
+  async create(storeId: string, data: CreateProductInput): Promise<Product> {
     const product = this.productRepository.create({
       ...data,
+      storeId,
       photoUrl: this.getImageName(data.photoUrl),
     });
 
@@ -24,8 +25,9 @@ export class ProductService {
     return this.findById(createdProduct.id) as Promise<Product>;
   }
 
-  findAll(): Promise<Product[]> {
+  findAll(storeId: string): Promise<Product[]> {
     return this.productRepository.find({
+      where: { storeId },
       relations: { category: true },
     });
   }

@@ -13,14 +13,17 @@ export class TableService {
     private readonly tableRepository: Repository<Table>,
   ) {}
 
-  async create(data: CreateTableInput): Promise<Table> {
-    const table = this.tableRepository.create(data);
+  async create(storeId: string, data: CreateTableInput): Promise<Table> {
+    const table = this.tableRepository.create({
+      ...data,
+      storeId,
+    });
 
     return this.tableRepository.save(table);
   }
 
-  findAll(): Promise<Table[]> {
-    return this.tableRepository.find();
+  findAll(storeId: string): Promise<Table[]> {
+    return this.tableRepository.find({ where: { storeId } });
   }
 
   findById(id: string): Promise<Table | null> {

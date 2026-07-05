@@ -13,16 +13,20 @@ export class CategoryService {
     private readonly categoryRepository: Repository<Category>,
   ) {}
 
-  async create(data: CreateCategoryInput): Promise<Category> {
-    const category = this.categoryRepository.create(data);
+  async create(storeId: string, data: CreateCategoryInput): Promise<Category> {
+    const category = this.categoryRepository.create({
+      ...data,
+      storeId,
+    });
 
     return this.categoryRepository.save(category);
   }
 
-  findAll(): Promise<Category[]> {
+  findAll(storeId: string): Promise<Category[]> {
     return this.categoryRepository
       .createQueryBuilder('category')
       .leftJoinAndSelect('category.products', 'product')
+      .where('category.storeId = :storeId', { storeId })
       .getMany();
   }
 
