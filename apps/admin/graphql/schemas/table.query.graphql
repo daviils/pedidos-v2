@@ -1,5 +1,5 @@
-query Tables {
-    tables {
+query Tables($storeId: String!) {
+    tables(storeId: $storeId) {
         id
         name
         status
@@ -20,8 +20,8 @@ query Table($id: String!) {
     }
 }
 
-mutation CreateTable($data: CreateTableInput!) {
-    createTable(data: $data) {
+mutation CreateTable($storeId: String!, $data: CreateTableInput!) {
+    createTable(storeId: $storeId, data: $data) {
         id
         name
         status

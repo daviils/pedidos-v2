@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Apollo } from 'apollo-angular';
 import { finalize, take } from 'rxjs';
 
+import { StoreService } from '../../../core/services/store.service';
 import { UploadService } from '../../../core/services/upload.service';
 import { UtilComponent } from '../../../core/util.component';
 import {
@@ -38,6 +39,7 @@ export class ProductDetailComponent implements OnInit {
   protected selectedPhotoFile: File | null = null;
   protected photoTouched = false;
   protected categories: Category[] = [];
+  private readonly storeService = inject(StoreService);
 
   constructor(
     private readonly activatedRoute: ActivatedRoute,
@@ -155,6 +157,7 @@ export class ProductDetailComponent implements OnInit {
       .mutate({
         mutation: CreateProductDocument,
         variables: {
+          storeId: this.storeService.storeId(),
           data: {
             title: this.product.title,
             description: this.product.description,
@@ -246,6 +249,7 @@ export class ProductDetailComponent implements OnInit {
     this.apollo
       .query({
         query: CategoriesDocument,
+        variables: { storeId: this.storeService.storeId() },
       })
       .pipe(take(1))
       .subscribe({

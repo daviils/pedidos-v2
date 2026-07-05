@@ -1,10 +1,10 @@
 overwrite: true
 schema: "http://localhost:3000/graphql"
 documents:
-  - "apps/admin/graphql/**/*.graphql"
-  - "!apps/admin/graphql/schema.graphql"
+  - "graphql/**/*.graphql"
+  - "!graphql/schema.graphql"
 generates:
-  apps/admin/src/app/graphql/generated/:
+  src/app/graphql/generated/:
     preset: "client"
     presetConfig:
       gqlTagName: "gql"

@@ -16,11 +16,13 @@ type AuthToken {
 
 type Category {
   id: String!
+  storeId: String!
   title: String!
   description: String!
   createdAt: DateTime!
   updatedAt: DateTime!
   deletedAt: DateTime
+  store: Store!
   products: [Product!]!
 }
 
@@ -59,6 +61,14 @@ input CreateProductInput {
   photoUrl: String!
   price: Float!
   categoryId: String
+}
+
+input CreateStoreInput {
+  name: String!
+  description: String
+  phone: String
+  address: String
+  isActive: Boolean
 }
 
 input CreateSubscriptionInput {
@@ -138,7 +148,7 @@ type Mutation {
   createUser(data: CreateUserInput!): User!
   updateUser(id: String!, data: UpdateUserInput!): User!
   deleteUser(id: String!): User!
-  createCategory(data: CreateCategoryInput!): Category!
+  createCategory(storeId: String!, data: CreateCategoryInput!): Category!
   updateCategory(id: String!, data: UpdateCategoryInput!): Category!
   deleteCategory(id: String!): Category!
   createDeliveryFee(data: CreateDeliveryFeeInput!): DeliveryFee!
@@ -150,13 +160,16 @@ type Mutation {
   createOrder(data: CreateOrderInput!): Order!
   updateOrder(id: String!, data: UpdateOrderInput!): Order!
   deleteOrder(id: String!): Order!
-  createProduct(data: CreateProductInput!): Product!
+  createProduct(storeId: String!, data: CreateProductInput!): Product!
   updateProduct(id: String!, data: UpdateProductInput!): Product!
   deleteProduct(id: String!): Product!
+  createStore(data: CreateStoreInput!): Store!
+  updateStore(id: String!, data: UpdateStoreInput!): Store!
+  deleteStore(id: String!): Store!
   createSubscription(data: CreateSubscriptionInput!): Subscription!
   updateSubscription(id: String!, data: UpdateSubscriptionInput!): Subscription!
   deleteSubscription(id: String!): Subscription!
-  createTable(data: CreateTableInput!): Table!
+  createTable(storeId: String!, data: CreateTableInput!): Table!
   updateTable(id: String!, data: UpdateTableInput!): Table!
   deleteTable(id: String!): Table!
   createTableSession(data: CreateTableSessionInput!): TableSession!
@@ -204,12 +217,14 @@ enum OrderStatus {
 
 type Product {
   id: String!
+  storeId: String!
   title: String!
   description: String!
   photoUrl: String
   price: Float!
   categoryId: String
-  category: Category!
+  store: Store!
+  category: Category
 }
 
 type Query {
@@ -220,7 +235,7 @@ type Query {
   me: User!
   users: [User!]!
   user(id: String!): User
-  categories: [Category!]!
+  categories(storeId: String!): [Category!]!
   category(id: String!): Category
   deliveryFees: [DeliveryFee!]!
   deliveryFee(id: String!): DeliveryFee
@@ -228,11 +243,13 @@ type Query {
   orders: [Order!]!
   ordersByTableSession(tableSessionId: String!): [Order!]!
   order(id: String!): Order
-  products: [Product!]!
+  products(storeId: String!): [Product!]!
   product(id: String!): Product
+  stores: [Store!]!
+  store(id: String!): Store
   subscriptions: [Subscription!]!
   subscription(id: String!): Subscription
-  tables: [Table!]!
+  tables(storeId: String!): [Table!]!
   table(id: String!): Table
   tableSessions: [TableSession!]!
   tableSessionsOpen: [TableSession!]!
@@ -244,6 +261,20 @@ type Query {
   userAdminAddress(id: String!): UserAdminAddress
 }
 
+type Store {
+  id: String!
+  userAdminId: String!
+  name: String!
+  description: String
+  phone: String
+  address: String
+  isActive: Boolean!
+  userAdmin: UserAdmin!
+  categories: [Category!]!
+  products: [Product!]!
+  tables: [Table!]!
+}
+
 type Subscription {
   id: String!
   title: String!
@@ -253,11 +284,13 @@ type Subscription {
 
 type Table {
   id: String!
+  storeId: String!
   name: String!
   status: TableStatus!
   createdAt: DateTime!
   updatedAt: DateTime!
   deletedAt: DateTime
+  store: Store!
 }
 
 type TableSession {
@@ -307,6 +340,14 @@ input UpdateProductInput {
   photoUrl: String
   price: Float
   categoryId: String
+}
+
+input UpdateStoreInput {
+  name: String
+  description: String
+  phone: String
+  address: String
+  isActive: Boolean
 }
 
 input UpdateSubscriptionInput {
@@ -386,6 +427,7 @@ type UserAdmin {
   name: String!
   addresses: [UserAdminAddress!]!
   deliveryFees: [DeliveryFee!]!
+  stores: [Store!]!
 }
 
 type UserAdminAddress {
@@ -423,3 +465,4 @@ enum UserAdminSubscriptionStatus {
 enum UserProfile {
   User
 }
+

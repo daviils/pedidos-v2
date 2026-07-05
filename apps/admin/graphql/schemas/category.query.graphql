@@ -1,5 +1,5 @@
-query Categories {
-    categories {
+query Categories($storeId: String!) {
+    categories(storeId: $storeId) {
         id
         title
         description
@@ -14,8 +14,8 @@ query Category($id: String!) {
     }
 }
 
-mutation CreateCategory($data: CreateCategoryInput!) {
-    createCategory(data: $data) {
+mutation CreateCategory($storeId: String!, $data: CreateCategoryInput!) {
+    createCategory(storeId: $storeId, data: $data) {
         id
         title
         description

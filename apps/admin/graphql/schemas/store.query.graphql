@@ -1,0 +1,52 @@
+query Stores {
+    stores {
+        id
+        userAdminId
+        name
+        description
+        phone
+        address
+        isActive
+    }
+}
+
+query Store($id: String!) {
+    store(id: $id) {
+        id
+        userAdminId
+        name
+        description
+        phone
+        address
+        isActive
+    }
+}
+
+mutation CreateStore($data: CreateStoreInput!) {
+    createStore(data: $data) {
+        id
+        name
+        description
+        phone
+        address
+        isActive
+    }
+}
+
+mutation UpdateStore($id: String!, $data: UpdateStoreInput!) {
+    updateStore(id: $id, data: $data) {
+        id
+        name
+        description
+        phone
+        address
+        isActive
+    }
+}
+
+mutation DeleteStore($id: String!) {
+    deleteStore(id: $id) {
+        id
+        name
+    }
+}

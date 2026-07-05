@@ -1,5 +1,5 @@
-query Products {
-    products {
+query Products($storeId: String!) {
+    products(storeId: $storeId) {
         id
         title
         description
@@ -23,8 +23,8 @@ query Product($id: String!) {
     }
 }
 
-mutation CreateProduct($data: CreateProductInput!) {
-    createProduct(data: $data) {
+mutation CreateProduct($storeId: String!, $data: CreateProductInput!) {
+    createProduct(storeId: $storeId, data: $data) {
         id
         title
         description

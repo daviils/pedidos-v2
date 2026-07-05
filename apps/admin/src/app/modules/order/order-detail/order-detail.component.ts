@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Apollo } from 'apollo-angular';
 import { finalize, take } from 'rxjs';
 
+import { StoreService } from '../../../core/services/store.service';
 import {
   CreateOrderDocument,
   type CreateOrderInput,
@@ -37,6 +38,7 @@ export class OrderDetailComponent implements OnInit {
   protected errorMessage = '';
   protected tableSessions: TableSession[] = [];
   protected products: Product[] = [];
+  private readonly storeService = inject(StoreService);
 
   protected readonly statusOptions = [
     { value: 'Pending', label: 'Pendente' },
@@ -236,6 +238,7 @@ export class OrderDetailComponent implements OnInit {
     this.apollo
       .query({
         query: ProductsDocument,
+        variables: { storeId: this.storeService.storeId() },
       })
       .pipe(take(1))
       .subscribe({

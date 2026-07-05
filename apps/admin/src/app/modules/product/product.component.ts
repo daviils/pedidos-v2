@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { finalize, take } from 'rxjs';
 
+import { StoreService } from '../../core/services/store.service';
 import {
   ProductsDocument,
   DeleteProductDocument,
@@ -22,6 +23,7 @@ export class ProductComponent implements OnInit {
   protected filter = '';
   protected isLoading = false;
   protected errorMessage = '';
+  private readonly storeService = inject(StoreService);
 
   constructor(private readonly apollo: Apollo) {}
 
@@ -72,6 +74,7 @@ export class ProductComponent implements OnInit {
     this.apollo
       .query({
         query: ProductsDocument,
+        variables: { storeId: this.storeService.storeId() },
       })
       .pipe(
         take(1),

@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { take } from 'rxjs';
 import { Router } from '@angular/router';
 
+import { StoreService } from '../../core/services/store.service';
 import {
   TableSessionsOpenDocument,
   DeleteTableSessionDocument,
@@ -27,6 +28,7 @@ export class TableSessionComponent implements OnInit {
   protected filter = '';
   protected isLoading = false;
   protected errorMessage = '';
+  private readonly storeService = inject(StoreService);
 
   constructor(
     private readonly apollo: Apollo,
@@ -53,7 +55,7 @@ export class TableSessionComponent implements OnInit {
 
   protected loadTables(): void {
     this.apollo
-      .query({ query: TablesDocument })
+      .query({ query: TablesDocument, variables: { storeId: this.storeService.storeId() } })
       .pipe(take(1))
       .subscribe({
         next: ({ data }) => {

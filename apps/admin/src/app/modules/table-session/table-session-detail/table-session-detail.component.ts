@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Apollo } from 'apollo-angular';
@@ -7,6 +7,7 @@ import jsPDF from 'jspdf';
 import { applyPlugin } from 'jspdf-autotable';
 applyPlugin(jsPDF);
 
+import { StoreService } from '../../../core/services/store.service';
 import {
   CloseTableSessionDocument,
   CreateTableSessionDocument,
@@ -50,6 +51,7 @@ export class TableSessionDetailComponent implements OnInit {
   protected errorMessage = '';
   protected orders: Order[] = [];
   protected ordersLoading = false;
+  private readonly storeService = inject(StoreService);
 
   constructor(
     private readonly activatedRoute: ActivatedRoute,
@@ -91,7 +93,7 @@ export class TableSessionDetailComponent implements OnInit {
 
   private loadTables(): void {
     this.apollo
-      .query({ query: TablesDocument })
+      .query({ query: TablesDocument, variables: { storeId: this.storeService.storeId() } })
       .pipe(take(1))
       .subscribe({
         next: ({ data }) => {

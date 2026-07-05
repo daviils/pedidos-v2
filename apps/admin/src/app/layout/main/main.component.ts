@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { Apollo } from 'apollo-angular';
 import { take } from 'rxjs';
 
+import { StoreService } from '../../core/services/store.service';
 import { MeDocument } from '../../graphql/generated/graphql';
 
 @Component({
@@ -17,6 +18,7 @@ export class MainComponent implements OnInit {
   constructor(
     private readonly apollo: Apollo,
     private readonly router: Router,
+    private readonly storeService: StoreService,
   ) {}
 
   ngOnInit(): void {

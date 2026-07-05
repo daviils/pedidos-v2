@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Apollo } from 'apollo-angular';
 import { finalize, take } from 'rxjs';
 
+import { StoreService } from '../../../core/services/store.service';
 import {
   CreateCategoryDocument,
   type CreateCategoryInput,
@@ -23,6 +24,7 @@ export class CategoryDetailComponent implements OnInit {
   protected isLoading = false;
   protected isSubmitting = false;
   protected errorMessage = '';
+  private readonly storeService = inject(StoreService);
 
   constructor(
     private readonly activatedRoute: ActivatedRoute,
@@ -99,6 +101,7 @@ export class CategoryDetailComponent implements OnInit {
       .mutate({
         mutation: CreateCategoryDocument,
         variables: {
+          storeId: this.storeService.storeId(),
           data: {
             title: this.category.title,
             description: this.category.description,

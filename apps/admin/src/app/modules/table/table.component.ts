@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Apollo } from 'apollo-angular';
 import { finalize, take } from 'rxjs';
 
+import { StoreService } from '../../core/services/store.service';
 import {
   TablesDocument,
   DeleteTableDocument,
@@ -23,6 +24,7 @@ export class TableComponent implements OnInit {
   protected filter = '';
   protected isLoading = false;
   protected errorMessage = '';
+  private readonly storeService = inject(StoreService);
 
   constructor(
     private readonly apollo: Apollo,
@@ -52,6 +54,7 @@ export class TableComponent implements OnInit {
     this.apollo
       .query({
         query: TablesDocument,
+        variables: { storeId: this.storeService.storeId() },
       })
       .pipe(
         take(1),
