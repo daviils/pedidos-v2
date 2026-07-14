@@ -3,6 +3,12 @@ query Me {
         ...User
         stores {
             id
+            userAdminId
+            name
+            description
+            phone
+            address
+            isActive
         }
     }
 }

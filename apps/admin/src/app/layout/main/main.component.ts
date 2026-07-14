@@ -42,7 +42,9 @@ export class MainComponent implements OnInit {
       .pipe(take(1))
       .subscribe({
         next: ({ data }) => {
-          console.log('Me query result:', data);
+          if (data?.getMeAdmin?.stores?.length) {
+            this.storeService.storeId.set(data.getMeAdmin.stores[0].id);
+          }
         },
         error: () => {
           // localStorage.removeItem('accessToken');

@@ -27,6 +27,19 @@ export class UserAdminService {
     return this.userAdminRepository.findOne({ where: { id } });
   }
 
+  async findByIdWithStores(id: string): Promise<UserAdmin> {
+    const userAdmin = await this.userAdminRepository.findOne({
+      where: { id },
+      relations: { stores: true },
+    });
+
+    if (!userAdmin) {
+      throw new NotFoundException('Usuario admin nao encontrado');
+    }
+
+    return userAdmin;
+  }
+
   findByEmail(email: string): Promise<UserAdmin | null> {
     return this.userAdminRepository.findOne({ where: { email } });
   }
