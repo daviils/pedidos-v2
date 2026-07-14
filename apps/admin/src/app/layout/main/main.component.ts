@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { Apollo } from 'apollo-angular';
 import { take } from 'rxjs';
 
@@ -13,13 +13,19 @@ import { MeDocument } from '../../graphql/generated/graphql';
   styleUrl: './main.component.css',
 })
 export class MainComponent implements OnInit {
-  protected sidebarCollapsed = false;
+  protected menuOpen = false;
 
   constructor(
     private readonly apollo: Apollo,
     private readonly router: Router,
     private readonly storeService: StoreService,
-  ) {}
+  ) {
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        this.menuOpen = false;
+      }
+    });
+  }
 
   ngOnInit(): void {
     const accessToken = localStorage.getItem('accessToken');
@@ -39,9 +45,17 @@ export class MainComponent implements OnInit {
           console.log('Me query result:', data);
         },
         error: () => {
-          localStorage.removeItem('accessToken');
-          void this.router.navigateByUrl('/login');
+          // localStorage.removeItem('accessToken');
+          // void this.router.navigateByUrl('/login');
         },
       });
+  }
+
+  protected toggleMenu(): void {
+    this.menuOpen = !this.menuOpen;
+  }
+
+  protected closeMenu(): void {
+    this.menuOpen = false;
   }
 }

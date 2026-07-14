@@ -1,29 +1,52 @@
-<aside class="sidebar" [class.sidebar--collapsed]="collapsed">
+<aside class="sidebar" [class.sidebar--open]="open">
   <div class="sidebar__brand">
     <span class="material-icons sidebar__brand-icon">admin_panel_settings</span>
-    <span class="sidebar__brand-text" *ngIf="!collapsed">Admin</span>
+    <span class="sidebar__brand-text">Admin</span>
   </div>
 
-  <button type="button" class="sidebar__toggle" (click)="toggle()">
-    <span class="material-icons">chevron_left</span>
-  </button>
-
   <nav class="sidebar__nav">
-    <a
-      *ngFor="let route of routes"
-      class="sidebar__link"
-      [class.sidebar__link--active]="isActive(route.path)"
-      [routerLink]="route.path"
-    >
-      <span class="material-icons sidebar__link-icon">{{ route.icon }}</span>
-      <span class="sidebar__link-label" *ngIf="!collapsed">{{ route.label }}</span>
-    </a>
+    <ng-container *ngFor="let route of routes">
+      <ng-container *ngIf="route.children; else singleLink">
+        <button
+          type="button"
+          class="sidebar__link sidebar__link--accordion"
+          [class.sidebar__link--expanded]="expandedSections.has(route.label)"
+          [class.sidebar__link--active]="isChildActive(route.children)"
+          (click)="toggleSection(route.label)"
+        >
+          <span class="material-icons sidebar__link-icon">{{ route.icon }}</span>
+          <span class="sidebar__link-label">{{ route.label }}</span>
+          <span class="material-icons sidebar__accordion-icon">expand_more</span>
+        </button>
+        <div class="sidebar__subnav" *ngIf="expandedSections.has(route.label)">
+          <a
+            *ngFor="let child of route.children"
+            class="sidebar__link sidebar__link--child"
+            [class.sidebar__link--active]="isActive(child.path)"
+            [routerLink]="child.path"
+          >
+            <span class="material-icons sidebar__link-icon sidebar__link-icon--child">circle</span>
+            <span class="sidebar__link-label">{{ child.label }}</span>
+          </a>
+        </div>
+      </ng-container>
+      <ng-template #singleLink>
+        <a
+          class="sidebar__link"
+          [class.sidebar__link--active]="isActive(route.path)"
+          [routerLink]="route.path"
+        >
+          <span class="material-icons sidebar__link-icon">{{ route.icon }}</span>
+          <span class="sidebar__link-label">{{ route.label }}</span>
+        </a>
+      </ng-template>
+    </ng-container>
   </nav>
 
   <div class="sidebar__footer">
     <button type="button" class="sidebar__link sidebar__link--logout" (click)="logout()">
       <span class="material-icons sidebar__link-icon">logout</span>
-      <span class="sidebar__link-label" *ngIf="!collapsed">Sair</span>
+      <span class="sidebar__link-label">Sair</span>
     </button>
   </div>
 </aside>

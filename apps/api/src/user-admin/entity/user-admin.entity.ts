@@ -31,7 +31,7 @@ export class UserAdmin {
   @OneToMany(() => DeliveryFee, (deliveryFee) => deliveryFee.userAdmin)
   deliveryFees: DeliveryFee[];
 
-  @Field(() => [Store])
+  @Field(() => [Store], { nullable: true })
   @OneToMany(() => Store, (store) => store.userAdmin)
-  stores: Store[];
+  stores?: Store[];
 }

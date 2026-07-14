@@ -1,6 +1,14 @@
-<div class="layout" [class.layout--sidebar-collapsed]="sidebarCollapsed">
-  <app-sidebar (collapsedChange)="sidebarCollapsed = $event" />
+<div class="layout" [class.layout--menu-open]="menuOpen">
+  <app-sidebar
+    [open]="menuOpen"
+  />
+  @if (menuOpen) {
+    <div class="layout__backdrop" (click)="closeMenu()"></div>
+  }
   <main class="layout__content">
+    <button type="button" class="layout__menu-btn" (click)="toggleMenu()">
+      <span class="material-icons">{{ menuOpen ? 'close' : 'menu' }}</span>
+    </button>
     <router-outlet />
   </main>
 </div>
