@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { Apollo } from 'apollo-angular';
 import { take } from 'rxjs';
@@ -14,6 +14,7 @@ import { MeDocument } from '../../graphql/generated/graphql';
 })
 export class MainComponent implements OnInit {
   protected menuOpen = false;
+  protected loaded = signal(false);
 
   constructor(
     private readonly apollo: Apollo,
@@ -46,10 +47,11 @@ export class MainComponent implements OnInit {
             this.storeService.stores.set(data.getMeAdmin.stores);
             this.storeService.selectedStoreId.set(data.getMeAdmin.stores[0].id);
           }
+          this.loaded.set(true);
         },
         error: () => {
-          // localStorage.removeItem('accessToken');
-          // void this.router.navigateByUrl('/login');
+          localStorage.removeItem('accessToken');
+          void this.router.navigateByUrl('/login');
         },
       });
   }

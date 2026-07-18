@@ -23,7 +23,7 @@ export class ProductComponent implements OnInit {
   protected filter = '';
   protected isLoading = false;
   protected errorMessage = '';
-  private readonly storeService = inject(StoreService);
+  protected readonly storeService = inject(StoreService);
 
   constructor(private readonly apollo: Apollo) {}
 
@@ -65,6 +65,11 @@ export class ProductComponent implements OnInit {
           this.errorMessage = 'Nao foi possivel excluir o produto';
         },
       });
+  }
+
+  protected onStoreChange(storeId: string): void {
+    this.storeService.selectedStoreId.set(storeId);
+    this.loadProducts();
   }
 
   protected loadProducts(): void {

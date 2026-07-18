@@ -24,14 +24,31 @@
   </div>
 
   <div class="category-page__filter">
-    <label for="category-filter" class="form-label fw-semibold">Filtro</label>
-    <input
-      id="category-filter"
-      type="search"
-      class="form-control"
-      placeholder="Buscar por titulo ou descricao"
-      [(ngModel)]="filter"
-    />
+    <div class="row g-3 align-items-end">
+      <div class="col-sm">
+        <label for="category-filter" class="form-label fw-semibold">Filtro</label>
+        <input
+          id="category-filter"
+          type="search"
+          class="form-control"
+          placeholder="Buscar por titulo ou descricao"
+          [(ngModel)]="filter"
+        />
+      </div>
+      <div class="col-sm-auto">
+        <label for="store-filter" class="form-label fw-semibold">Loja</label>
+        <select
+          id="store-filter"
+          class="form-select"
+          [ngModel]="storeService.selectedStoreId()"
+          (ngModelChange)="onStoreChange($event)"
+        >
+          <option *ngFor="let store of storeService.stores()" [ngValue]="store.id">
+            {{ store.name }}
+          </option>
+        </select>
+      </div>
+    </div>
   </div>
 
   <div class="table-responsive category-page__table">

@@ -3,12 +3,25 @@
   min-height: 100vh;
 }
 
+.layout--loading {
+  align-items: center;
+  justify-content: center;
+}
+
 .layout__content {
   flex: 1;
   margin-left: 240px;
   padding: 2rem;
   background: #f8f9fa;
   transition: margin-left 0.2s ease;
+}
+
+.layout__content--centered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0;
+  background: transparent ;
 }
 
 .layout__menu-btn {
