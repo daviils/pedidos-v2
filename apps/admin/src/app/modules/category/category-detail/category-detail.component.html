@@ -10,8 +10,8 @@
 
   <form
     class="category-detail-page__form"
-    #categoryForm="ngForm"
-    (ngSubmit)="submit(categoryForm)"
+    [formGroup]="form"
+    (ngSubmit)="submit()"
   >
     <div *ngIf="isLoading" class="alert alert-secondary py-2">
       Carregando categoria...
@@ -22,18 +22,39 @@
     </div>
 
     <div class="mb-3">
+      <label for="storeId" class="form-label fw-semibold">Loja</label>
+      <select
+        id="storeId"
+        class="form-select"
+        formControlName="storeId"
+      >
+        <option value="" disabled>Selecione uma loja</option>
+        <option
+          *ngFor="let store of storeService.stores()"
+          [value]="store.id"
+        >
+          {{ store.name }}
+        </option>
+      </select>
+      <div
+        *ngIf="form.controls['storeId'].invalid && form.controls['storeId'].touched"
+        class="form-text text-danger"
+      >
+        Selecione uma loja.
+      </div>
+      <a class="d-inline-block mt-1" routerLink="/store/create">Criar loja</a>
+    </div>
+
+    <div class="mb-3">
       <label for="title" class="form-label fw-semibold">Titulo</label>
       <input
         id="title"
-        name="title"
         type="text"
         class="form-control"
-        required
-        [(ngModel)]="category.title"
-        #title="ngModel"
+        formControlName="title"
       />
       <div
-        *ngIf="title.invalid && title.touched"
+        *ngIf="form.controls['title'].invalid && form.controls['title'].touched"
         class="form-text text-danger"
       >
         Informe o titulo da categoria.
@@ -44,15 +65,12 @@
       <label for="description" class="form-label fw-semibold">Descricao</label>
       <textarea
         id="description"
-        name="description"
         class="form-control"
         rows="4"
-        required
-        [(ngModel)]="category.description"
-        #description="ngModel"
+        formControlName="description"
       ></textarea>
       <div
-        *ngIf="description.invalid && description.touched"
+        *ngIf="form.controls['description'].invalid && form.controls['description'].touched"
         class="form-text text-danger"
       >
         Informe a descricao da categoria.

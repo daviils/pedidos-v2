@@ -10,8 +10,8 @@
 
   <form
     class="table-detail-page__form"
-    #tableForm="ngForm"
-    (ngSubmit)="submit(tableForm)"
+    [formGroup]="form"
+    (ngSubmit)="submit()"
   >
     <div *ngIf="isLoading" class="alert alert-secondary py-2">
       Carregando mesa...
@@ -22,23 +22,45 @@
     </div>
 
     <div class="mb-3">
+      <label for="storeId" class="form-label fw-semibold">Loja</label>
+      <select
+        id="storeId"
+        class="form-select"
+        formControlName="storeId"
+      >
+        <option value="" disabled>Selecione uma loja</option>
+        <option
+          *ngFor="let store of storeService.stores()"
+          [value]="store.id"
+        >
+          {{ store.name }}
+        </option>
+      </select>
+      <div
+        *ngIf="form.controls['storeId'].invalid && form.controls['storeId'].touched"
+        class="form-text text-danger"
+      >
+        Selecione uma loja.
+      </div>
+      <a class="d-inline-block mt-1" routerLink="/store/create">Criar loja</a>
+    </div>
+
+    <div class="mb-3">
       <label for="name" class="form-label fw-semibold">Nome</label>
       <input
         id="name"
-        name="name"
         type="text"
         class="form-control"
-        required
-        [(ngModel)]="table.name"
-        #name="ngModel"
+        formControlName="name"
       />
       <div
-        *ngIf="name.invalid && name.touched"
+        *ngIf="form.controls['name'].invalid && form.controls['name'].touched"
         class="form-text text-danger"
       >
         Informe o nome da mesa.
       </div>
     </div>
+
     <div class="table-detail-page__actions">
       <a class="btn btn-outline-secondary" routerLink="/table">Cancelar</a>
       <button

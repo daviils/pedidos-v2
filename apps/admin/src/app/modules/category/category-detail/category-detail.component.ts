@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Apollo } from 'apollo-angular';
 import { finalize, take } from 'rxjs';
@@ -7,7 +7,6 @@ import { finalize, take } from 'rxjs';
 import { StoreService } from '../../../core/services/store.service';
 import {
   CreateCategoryDocument,
-  type CreateCategoryInput,
   CategoryDocument,
   UpdateCategoryDocument,
 } from '../../../graphql/generated/graphql';
@@ -19,17 +18,23 @@ import {
   styleUrl: './category-detail.component.css',
 })
 export class CategoryDetailComponent implements OnInit {
-  protected category: CreateCategoryInput = this.createEmptyCategory();
   protected categoryId = '';
   protected isLoading = false;
   protected isSubmitting = false;
   protected errorMessage = '';
-  private readonly storeService = inject(StoreService);
+  protected readonly storeService = inject(StoreService);
+
+  protected readonly form = this.formBuilder.nonNullable.group({
+    storeId: [this.storeService.selectedStoreId(), [Validators.required]],
+    title: ['', [Validators.required]],
+    description: ['', [Validators.required]],
+  });
 
   constructor(
     private readonly activatedRoute: ActivatedRoute,
     private readonly apollo: Apollo,
     private readonly router: Router,
+    private readonly formBuilder: FormBuilder,
   ) {}
 
   ngOnInit(): void {
@@ -40,13 +45,13 @@ export class CategoryDetailComponent implements OnInit {
     }
   }
 
-  protected submit(form: NgForm): void {
+  protected submit(): void {
     if (this.isSubmitting) {
       return;
     }
 
-    if (form.invalid) {
-      form.control.markAllAsTouched();
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
       return;
     }
 
@@ -82,10 +87,10 @@ export class CategoryDetailComponent implements OnInit {
             return;
           }
 
-          this.category = {
+          this.form.patchValue({
             title: data.category.title,
             description: data.category.description,
-          };
+          });
         },
         error: () => {
           this.errorMessage = 'Nao foi possivel carregar a categoria';
@@ -96,16 +101,14 @@ export class CategoryDetailComponent implements OnInit {
   private createCategory(): void {
     this.isSubmitting = true;
     this.errorMessage = '';
+    const { storeId, title, description } = this.form.getRawValue();
 
     this.apollo
       .mutate({
         mutation: CreateCategoryDocument,
         variables: {
-          storeId: this.storeService.storeId(),
-          data: {
-            title: this.category.title,
-            description: this.category.description,
-          },
+          storeId,
+          data: { title, description },
         },
       })
       .pipe(
@@ -125,16 +128,14 @@ export class CategoryDetailComponent implements OnInit {
   private updateCategory(): void {
     this.isSubmitting = true;
     this.errorMessage = '';
+    const { title, description } = this.form.getRawValue();
 
     this.apollo
       .mutate({
         mutation: UpdateCategoryDocument,
         variables: {
           id: this.categoryId,
-          data: {
-            title: this.category.title,
-            description: this.category.description,
-          },
+          data: { title, description },
         },
       })
       .pipe(
@@ -151,10 +152,4 @@ export class CategoryDetailComponent implements OnInit {
       });
   }
 
-  private createEmptyCategory(): CreateCategoryInput {
-    return {
-      title: '',
-      description: '',
-    };
-  }
 }

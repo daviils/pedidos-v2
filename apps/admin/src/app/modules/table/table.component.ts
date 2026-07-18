@@ -54,7 +54,7 @@ export class TableComponent implements OnInit {
     this.apollo
       .query({
         query: TablesDocument,
-        variables: { storeId: this.storeService.storeId() },
+        variables: { storeId: this.storeService.selectedStoreId() },
       })
       .pipe(
         take(1),

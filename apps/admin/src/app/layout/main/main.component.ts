@@ -43,7 +43,8 @@ export class MainComponent implements OnInit {
       .subscribe({
         next: ({ data }) => {
           if (data?.getMeAdmin?.stores?.length) {
-            this.storeService.storeId.set(data.getMeAdmin.stores[0].id);
+            this.storeService.stores.set(data.getMeAdmin.stores);
+            this.storeService.selectedStoreId.set(data.getMeAdmin.stores[0].id);
           }
         },
         error: () => {

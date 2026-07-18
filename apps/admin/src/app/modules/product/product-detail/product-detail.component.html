@@ -10,8 +10,8 @@
 
   <form
     class="product-detail-page__form"
-    #productForm="ngForm"
-    (ngSubmit)="submit(productForm)"
+    [formGroup]="form"
+    (ngSubmit)="submit()"
   >
     <div *ngIf="isLoading" class="alert alert-secondary py-2">
       Carregando produto...
@@ -21,24 +21,47 @@
       {{ errorMessage }}
     </div>
 
+    <div class="mb-3">
+      <label for="storeId" class="form-label fw-semibold">Loja</label>
+      <select
+        id="storeId"
+        class="form-select"
+        formControlName="storeId"
+      >
+        <option value="" disabled>Selecione uma loja</option>
+        <option
+          *ngFor="let store of storeService.stores()"
+          [value]="store.id"
+        >
+          {{ store.name }}
+        </option>
+      </select>
+      <div
+        *ngIf="form.controls['storeId'].invalid && form.controls['storeId'].touched"
+        class="form-text text-danger"
+      >
+        Selecione uma loja.
+      </div>
+      <a class="d-inline-block mt-1" routerLink="/store/create">Criar loja</a>
+    </div>
+
     <div class="mb-4">
       <label for="photo" class="form-label fw-semibold">Imagem</label>
       <img
-        *ngIf="product.photoUrl"
+        *ngIf="form.controls['photoUrl'].value"
         class="product-detail-page__image"
         [src]="productImageUrl"
-        [alt]="product.title"
+        [alt]="form.controls['title'].value"
       />
       <input
         id="photo"
-        name="photo"
         type="file"
         class="form-control"
         accept="image/*"
         (change)="selectPhoto($event)"
       />
       <div
-        *ngIf="photoTouched && !product.photoUrl && !selectedPhotoFile"
+        *ngIf="photoTouched && !form.controls['photoUrl'].value && !selectedPhotoFile"
         class="form-text text-danger"
       >
         Informe a imagem do produto.
@@ -52,15 +75,12 @@
       <label for="title" class="form-label fw-semibold">Titulo</label>
       <input
         id="title"
-        name="title"
         type="text"
         class="form-control"
-        required
-        [(ngModel)]="product.title"
-        #title="ngModel"
+        formControlName="title"
       />
       <div
-        *ngIf="title.invalid && title.touched"
+        *ngIf="form.controls['title'].invalid && form.controls['title'].touched"
         class="form-text text-danger"
       >
         Informe o titulo do produto.
@@ -71,15 +91,12 @@
       <label for="description" class="form-label fw-semibold">Descricao</label>
       <textarea
         id="description"
-        name="description"
         class="form-control"
         rows="4"
-        required
-        [(ngModel)]="product.description"
-        #description="ngModel"
+        formControlName="description"
       ></textarea>
       <div
-        *ngIf="description.invalid && description.touched"
+        *ngIf="form.controls['description'].invalid && form.controls['description'].touched"
         class="form-text text-danger"
       >
         Informe a descricao do produto.
@@ -90,19 +107,16 @@
       <label for="category" class="form-label fw-semibold">Categoria</label>
       <select
         id="category"
-        name="category"
         class="form-select"
-        required
-        [(ngModel)]="product.categoryId"
-        #category="ngModel"
+        formControlName="categoryId"
       >
-        <option [ngValue]="null" disabled>Selecione uma categoria</option>
-        <option *ngFor="let cat of categories" [ngValue]="cat.id">
+        <option value="" disabled>Selecione uma categoria</option>
+        <option *ngFor="let cat of categories" [value]="cat.id">
           {{ cat.title }}
         </option>
       </select>
       <div
-        *ngIf="category.invalid && category.touched"
+        *ngIf="form.controls['categoryId'].invalid && form.controls['categoryId'].touched"
         class="form-text text-danger"
       >
         Selecione uma categoria.
@@ -113,17 +127,14 @@
       <label for="price" class="form-label fw-semibold">Preco</label>
       <input
         id="price"
-        name="price"
         type="text"
         class="form-control"
         inputmode="numeric"
-        required
-        [ngModel]="priceFormatted"
-        (ngModelChange)="formatPrice($event)"
-        #price="ngModel"
+        [value]="priceFormatted"
+        (input)="onPriceInput($event)"
       />
       <div
-        *ngIf="price.invalid && price.touched"
+        *ngIf="form.controls['price'].invalid && form.controls['price'].touched"
         class="form-text text-danger"
       >
         Informe o preco do produto.

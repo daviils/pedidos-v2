@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Apollo } from 'apollo-angular';
 import { finalize, take } from 'rxjs';
@@ -10,7 +10,6 @@ import { UtilComponent } from '../../../core/util.component';
 import {
   CategoriesDocument,
   CreateProductDocument,
-  type CreateProductInput,
   ProductDocument,
   UpdateProductDocument,
 } from '../../../graphql/generated/graphql';
@@ -29,8 +28,6 @@ interface Category {
   styleUrl: './product-detail.component.css',
 })
 export class ProductDetailComponent implements OnInit {
-  protected product: CreateProductInput = this.createEmptyProduct();
-  protected priceFormatted = '';
   protected productId = '';
   protected isLoading = false;
   protected isSubmitting = false;
@@ -39,7 +36,17 @@ export class ProductDetailComponent implements OnInit {
   protected selectedPhotoFile: File | null = null;
   protected photoTouched = false;
   protected categories: Category[] = [];
-  private readonly storeService = inject(StoreService);
+  protected priceFormatted = '';
+  protected readonly storeService = inject(StoreService);
+
+  protected readonly form = this.formBuilder.nonNullable.group({
+    storeId: ['', [Validators.required]],
+    title: ['', [Validators.required]],
+    description: ['', [Validators.required]],
+    categoryId: [''],
+    price: [0, [Validators.required, Validators.min(0.01)]],
+    photoUrl: [''],
+  });
 
   constructor(
     private readonly activatedRoute: ActivatedRoute,
@@ -47,12 +54,15 @@ export class ProductDetailComponent implements OnInit {
     private readonly router: Router,
     private readonly uploadService: UploadService,
     private readonly utilComponent: UtilComponent,
+    private readonly formBuilder: FormBuilder,
   ) {
-    this.priceFormatted = this.utilComponent.formatMoney(this.product.price);
+    this.priceFormatted = this.utilComponent.formatMoney(0);
   }
 
   ngOnInit(): void {
     this.productId = this.activatedRoute.snapshot.paramMap.get('id') ?? '';
+    this.form.patchValue({ storeId: this.storeService.selectedStoreId() });
+    this.priceFormatted = this.utilComponent.formatMoney(this.form.getRawValue().price);
 
     this.loadCategories();
 
@@ -61,17 +71,18 @@ export class ProductDetailComponent implements OnInit {
     }
   }
 
-  protected submit(form: NgForm): void {
+  protected submit(): void {
     if (this.isSubmitting || this.isUploadingPhoto) {
       return;
     }
 
-    if (form.invalid) {
-      form.control.markAllAsTouched();
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
       return;
     }
 
-    if (!this.product.photoUrl && !this.selectedPhotoFile) {
+    const { photoUrl } = this.form.getRawValue();
+    if (!photoUrl && !this.selectedPhotoFile) {
       this.photoTouched = true;
       return;
     }
@@ -91,14 +102,15 @@ export class ProductDetailComponent implements OnInit {
     this.uploadSelectedPhoto(this.selectedPhotoFile);
   }
 
-  protected formatPrice(value: string): void {
+  protected onPriceInput(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
     const { price, priceFormatted } = this.utilComponent.formatPrice(value);
-    this.product.price = price;
+    this.form.patchValue({ price });
     this.priceFormatted = priceFormatted;
   }
 
   protected get productImageUrl(): string {
-    return `${environment.productImageBaseUrl}${this.product.photoUrl}`;
+    return `${environment.productImageBaseUrl}${this.form.getRawValue().photoUrl}`;
   }
 
   private saveProduct(): void {
@@ -117,9 +129,7 @@ export class ProductDetailComponent implements OnInit {
     this.apollo
       .query({
         query: ProductDocument,
-        variables: {
-          id,
-        },
+        variables: { id },
       })
       .pipe(
         take(1),
@@ -132,13 +142,13 @@ export class ProductDetailComponent implements OnInit {
             return;
           }
 
-          this.product = {
+          this.form.patchValue({
             title: data.product.title,
             description: data.product.description,
             photoUrl: data.product.photoUrl ?? '',
             price: data.product.price,
-            categoryId: data.product.categoryId,
-          };
+            categoryId: data.product.categoryId ?? '',
+          });
           this.priceFormatted = this.utilComponent.formatMoney(
             data.product.price,
           );
@@ -152,18 +162,19 @@ export class ProductDetailComponent implements OnInit {
   private createProduct(): void {
     this.isSubmitting = true;
     this.errorMessage = '';
+    const { storeId, title, description, photoUrl, price, categoryId } = this.form.getRawValue();
 
     this.apollo
       .mutate({
         mutation: CreateProductDocument,
         variables: {
-          storeId: this.storeService.storeId(),
+          storeId,
           data: {
-            title: this.product.title,
-            description: this.product.description,
-            photoUrl: this.product.photoUrl,
-            price: Number(this.product.price),
-            categoryId: this.product.categoryId || null,
+            title,
+            description,
+            photoUrl,
+            price: Number(price),
+            categoryId: categoryId || null,
           },
         },
       })
@@ -184,6 +195,8 @@ export class ProductDetailComponent implements OnInit {
   private updateProduct(): void {
     this.isSubmitting = true;
     this.errorMessage = '';
+    const { title, description, photoUrl, price, categoryId } =
+      this.form.getRawValue();
 
     this.apollo
       .mutate({
@@ -191,11 +204,11 @@ export class ProductDetailComponent implements OnInit {
         variables: {
           id: this.productId,
           data: {
-            title: this.product.title,
-            description: this.product.description,
-            photoUrl: this.product.photoUrl,
-            price: Number(this.product.price),
-            categoryId: this.product.categoryId || null,
+            title,
+            description,
+            photoUrl,
+            price: Number(price),
+            categoryId: categoryId || null,
           },
         },
       })
@@ -225,31 +238,21 @@ export class ProductDetailComponent implements OnInit {
       )
       .subscribe({
         next: ({ url }) => {
-          this.product.photoUrl = url;
+          this.form.patchValue({ photoUrl: url });
         },
         error: () => {
           this.selectedPhotoFile = null;
-          this.product.photoUrl = '';
+          this.form.patchValue({ photoUrl: '' });
           this.errorMessage = 'Nao foi possivel enviar a imagem do produto';
         },
       });
-  }
-
-  private createEmptyProduct(): CreateProductInput {
-    return {
-      title: '',
-      description: '',
-      photoUrl: '',
-      price: 0,
-      categoryId: null,
-    };
   }
 
   private loadCategories(): void {
     this.apollo
       .query({
         query: CategoriesDocument,
-        variables: { storeId: this.storeService.storeId() },
+        variables: { storeId: this.storeService.selectedStoreId() },
       })
       .pipe(take(1))
       .subscribe({

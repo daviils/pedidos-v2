@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Apollo } from 'apollo-angular';
 import { finalize, take } from 'rxjs';
@@ -7,7 +7,6 @@ import { finalize, take } from 'rxjs';
 import { StoreService } from '../../../core/services/store.service';
 import {
   CreateTableDocument,
-  type CreateTableInput,
   TableDocument,
   UpdateTableDocument,
 } from '../../../graphql/generated/graphql';
@@ -19,17 +18,22 @@ import {
   styleUrl: './table-detail.component.css',
 })
 export class TableDetailComponent implements OnInit {
-  protected table: CreateTableInput = this.createEmptyTable();
   protected tableId = '';
   protected isLoading = false;
   protected isSubmitting = false;
   protected errorMessage = '';
-  private readonly storeService = inject(StoreService);
+  protected readonly storeService = inject(StoreService);
+
+  protected readonly form = this.formBuilder.nonNullable.group({
+    storeId: [this.storeService.selectedStoreId(), [Validators.required]],
+    name: ['', [Validators.required]],
+  });
 
   constructor(
     private readonly activatedRoute: ActivatedRoute,
     private readonly apollo: Apollo,
     private readonly router: Router,
+    private readonly formBuilder: FormBuilder,
   ) {}
 
   ngOnInit(): void {
@@ -40,13 +44,13 @@ export class TableDetailComponent implements OnInit {
     }
   }
 
-  protected submit(form: NgForm): void {
+  protected submit(): void {
     if (this.isSubmitting) {
       return;
     }
 
-    if (form.invalid) {
-      form.control.markAllAsTouched();
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
       return;
     }
 
@@ -82,9 +86,9 @@ export class TableDetailComponent implements OnInit {
             return;
           }
 
-          this.table = {
+          this.form.patchValue({
             name: data.table.name,
-          };
+          });
         },
         error: () => {
           this.errorMessage = 'Nao foi possivel carregar a mesa';
@@ -95,15 +99,14 @@ export class TableDetailComponent implements OnInit {
   private createTable(): void {
     this.isSubmitting = true;
     this.errorMessage = '';
+    const { storeId, name } = this.form.getRawValue();
 
     this.apollo
       .mutate({
         mutation: CreateTableDocument,
         variables: {
-          storeId: this.storeService.storeId(),
-          data: {
-            name: this.table.name,
-          },
+          storeId,
+          data: { name },
         },
       })
       .pipe(
@@ -123,15 +126,14 @@ export class TableDetailComponent implements OnInit {
   private updateTable(): void {
     this.isSubmitting = true;
     this.errorMessage = '';
+    const { name } = this.form.getRawValue();
 
     this.apollo
       .mutate({
         mutation: UpdateTableDocument,
         variables: {
           id: this.tableId,
-          data: {
-            name: this.table.name,
-          },
+          data: { name },
         },
       })
       .pipe(
@@ -146,11 +148,5 @@ export class TableDetailComponent implements OnInit {
           this.errorMessage = 'Nao foi possivel atualizar a mesa';
         },
       });
-  }
-
-  private createEmptyTable(): CreateTableInput {
-    return {
-      name: '',
-    };
   }
 }

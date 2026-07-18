@@ -74,7 +74,7 @@ export class ProductComponent implements OnInit {
     this.apollo
       .query({
         query: ProductsDocument,
-        variables: { storeId: this.storeService.storeId() },
+        variables: { storeId: this.storeService.selectedStoreId() },
       })
       .pipe(
         take(1),

@@ -49,7 +49,7 @@ export class CategoryComponent implements OnInit {
     this.apollo
       .query({
         query: CategoriesDocument,
-        variables: { storeId: this.storeService.storeId() },
+        variables: { storeId: this.storeService.selectedStoreId() },
       })
       .pipe(
         take(1),

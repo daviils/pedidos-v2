@@ -93,7 +93,7 @@ export class TableSessionDetailComponent implements OnInit {
 
   private loadTables(): void {
     this.apollo
-      .query({ query: TablesDocument, variables: { storeId: this.storeService.storeId() } })
+      .query({ query: TablesDocument, variables: { storeId: this.storeService.selectedStoreId() } })
       .pipe(take(1))
       .subscribe({
         next: ({ data }) => {
