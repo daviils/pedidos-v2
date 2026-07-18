@@ -25,7 +25,7 @@ export class CategoryDetailComponent implements OnInit {
   protected readonly storeService = inject(StoreService);
 
   protected readonly form = this.formBuilder.nonNullable.group({
-    storeId: [this.storeService.selectedStoreId(), [Validators.required]],
+    storeId: ['', [Validators.required]],
     title: ['', [Validators.required]],
     description: ['', [Validators.required]],
   });

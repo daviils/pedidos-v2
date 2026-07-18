@@ -1,8 +1,8 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Apollo } from 'apollo-angular';
-import { finalize, take } from 'rxjs';
+import { Subscription, distinctUntilChanged, finalize, take } from 'rxjs';
 
 import { StoreService } from '../../../core/services/store.service';
 import { UploadService } from '../../../core/services/upload.service';
@@ -27,7 +27,7 @@ interface Category {
   templateUrl: './product-detail.component.html',
   styleUrl: './product-detail.component.css',
 })
-export class ProductDetailComponent implements OnInit {
+export class ProductDetailComponent implements OnInit, OnDestroy {
   protected productId = '';
   protected isLoading = false;
   protected isSubmitting = false;
@@ -38,6 +38,8 @@ export class ProductDetailComponent implements OnInit {
   protected categories: Category[] = [];
   protected priceFormatted = '';
   protected readonly storeService = inject(StoreService);
+
+  private storeIdSubscription?: Subscription;
 
   protected readonly form = this.formBuilder.nonNullable.group({
     storeId: ['', [Validators.required]],
@@ -61,14 +63,25 @@ export class ProductDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.productId = this.activatedRoute.snapshot.paramMap.get('id') ?? '';
-    this.form.patchValue({ storeId: this.storeService.selectedStoreId() });
     this.priceFormatted = this.utilComponent.formatMoney(this.form.getRawValue().price);
 
-    this.loadCategories();
+    this.storeIdSubscription = this.form.controls.storeId.valueChanges
+      .pipe(distinctUntilChanged())
+      .subscribe(storeId => {
+        if (storeId) {
+          this.loadCategories(storeId);
+          this.form.patchValue({ categoryId: '' });
+        }
+      });
+
 
     if (this.productId) {
       this.loadProduct(this.productId);
     }
+  }
+
+  ngOnDestroy(): void {
+    this.storeIdSubscription?.unsubscribe();
   }
 
   protected submit(): void {
@@ -149,6 +162,7 @@ export class ProductDetailComponent implements OnInit {
             price: data.product.price,
             categoryId: data.product.categoryId ?? '',
           });
+          
           this.priceFormatted = this.utilComponent.formatMoney(
             data.product.price,
           );
@@ -248,11 +262,11 @@ export class ProductDetailComponent implements OnInit {
       });
   }
 
-  private loadCategories(): void {
+  private loadCategories(storeId: string): void {
     this.apollo
       .query({
         query: CategoriesDocument,
-        variables: { storeId: this.storeService.selectedStoreId() },
+        variables: { storeId },
       })
       .pipe(take(1))
       .subscribe({
